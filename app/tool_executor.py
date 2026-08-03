@@ -11,8 +11,10 @@ def execute(tool_name: str, arguments: dict):
     if tool is None:
         return f"Unknown tool: {tool_name}"
 
+    function = tool["function"]
+
     try:
-        return tool(**arguments)
+        return function(**arguments)
 
     except TypeError as e:
         return (
