@@ -1,11 +1,57 @@
 import ast
 from pathlib import Path
+
 from app.config import WORKSPACE
 
 workspace = Path(WORKSPACE)
 
 
-def search_text(keyword: str):
+def iter_python_files():
+    """
+    Iterate through all Python files in the workspace.
+    """
+    return workspace.rglob("*.py")
+
+
+def read_file(path: str) -> str:
+    """
+    Read a file from the workspace.
+    """
+
+    file = workspace / path
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if file.is_dir():
+        return f"'{path}' is a directory."
+
+    return file.read_text(
+        encoding="utf-8",
+        errors="ignore",
+    )
+
+
+def list_directory(path: str = ".") -> str:
+    """
+    List files and folders inside a directory.
+    """
+
+    directory = workspace / path
+
+    if not directory.exists():
+        return f"Directory '{path}' does not exist."
+
+    return "\n".join(
+        file.name
+        for file in directory.iterdir()
+    )
+
+
+def search_text(keyword: str) -> str:
+    """
+    Search every project file for a keyword.
+    """
 
     matches = []
 
@@ -15,7 +61,11 @@ def search_text(keyword: str):
             continue
 
         try:
-            lines = file.read_text(encoding="utf-8").splitlines()
+
+            lines = file.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            ).splitlines()
 
             for line_number, line in enumerate(lines, start=1):
 
@@ -26,25 +76,29 @@ def search_text(keyword: str):
                     )
 
         except Exception:
-            pass
+            continue
 
     if not matches:
         return f"No matches found for '{keyword}'."
 
     return "\n".join(matches)
 
-def list_python_functions():
+
+def list_python_functions() -> str:
     """
-    Find every Python function inside the workspace.
+    List every Python function in the workspace.
     """
 
     results = []
 
-    for file in workspace.rglob("*.py"):
+    for file in iter_python_files():
 
         try:
 
-            source = file.read_text(encoding="utf-8")
+            source = file.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            )
 
             tree = ast.parse(source)
 
@@ -58,69 +112,58 @@ def list_python_functions():
 
                 results.append(
                     f"{file.relative_to(workspace)}\n"
-                    + "\n".join(f"- {func}()" for func in functions)
+                    + "\n".join(
+                        f"- {func}()"
+                        for func in functions
+                    )
                 )
 
         except Exception:
-            pass
+            continue
 
     if not results:
         return "No Python functions found."
 
     return "\n\n".join(results)
 
-def read_file(path: str):
-    file = workspace / path
 
-    if not file.exists():
-        return f"File '{path}' does not exist."
-
-    if file.is_dir():
-        return f"'{path}' is a directory."
-
-    return file.read_text(encoding="utf-8")
-
-
-def list_directory(path="."):
-    directory = workspace / path
-
-    if not directory.exists():
-        return f"Directory '{path}' does not exist."
-
-    return "\n".join(
-        file.name
-        for file in directory.iterdir()
-    )
-
-def get_function_source(function_name: str):
+def get_function_source(function_name: str) -> str:
     """
-    Returns the source code of a Python function.
+    Return the complete source code of a function.
     """
 
-    for file in workspace.rglob("*.py"):
+    for file in iter_python_files():
 
         try:
 
-            source = file.read_text(encoding="utf-8")
+            source = file.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            )
 
             tree = ast.parse(source)
 
             for node in tree.body:
 
-                if isinstance(node, ast.FunctionDef):
-
-                    if node.name == function_name:
-
-                        return ast.get_source_segment(source, node)
+                if (
+                    isinstance(node, ast.FunctionDef)
+                    and node.name == function_name
+                ):
+                    return ast.get_source_segment(
+                        source,
+                        node,
+                    )
 
         except Exception:
-            pass
+            continue
 
     return f"Function '{function_name}' not found."
 
-def get_project_context():
+
+def get_project_context() -> str:
     """
-    Returns the important files of the project.
+    Read important project files and return
+    their contents for summarization.
     """
 
     context = []
@@ -130,7 +173,6 @@ def get_project_context():
         if not file.is_file():
             continue
 
-        # Ignore cache files
         if "__pycache__" in str(file):
             continue
 
@@ -140,11 +182,8 @@ def get_project_context():
 
             content = file.read_text(
                 encoding="utf-8",
-                errors="ignore"
+                errors="ignore",
             )
-
-            # Prevent huge prompts
-            content = content[:1500]
 
             context.append(
                 f"""
@@ -152,26 +191,22 @@ def get_project_context():
 File: {relative}
 =========================
 
-{content}
+{content[:1500]}
 """
             )
 
         except Exception:
-            pass
+            continue
 
     return "\n".join(context)
 
-def review_file(path: str):
+
+def review_file(path: str) -> str:
     """
-    Returns the contents of a file for AI review.
+    Read a file for AI code review.
     """
 
     return read_file(path)
-
-
-
-
-
 
 
 TOOLS = {
