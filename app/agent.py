@@ -16,51 +16,37 @@ class Agent:
             }
         ]
 
-    def _is_tool_call(self, content: str):
+    def _parse_tool_call(self, content: str) -> dict | None:
+        """
+        Parse the LLM response and determine
+        whether it is a valid tool call.
+        """
+
         try:
+
             data = json.loads(content)
-    
+
             if not isinstance(data, dict):
                 return None
-    
+
             if "tool" not in data:
                 return None
-    
+
+            if "arguments" not in data:
+                return None
+
             return data
-    
+
         except json.JSONDecodeError:
             return None
 
-    def chat(self, user_message):
+    def _tool_result_prompt(self, result: str) -> str:
+        """
+        Create the follow-up prompt after
+        executing a tool.
+        """
 
-        self.messages.append(
-            {
-                "role": "user",
-                "content": user_message,
-            }
-        )
-
-        reply = ask_llm(self.messages)
-
-        content = reply.content
-
-        tool_call = self._is_tool_call(content)
-
-        if tool_call is None:
-            self.messages.append(reply)
-            return content
-
-        result = execute(
-            tool_call["tool"],
-            tool_call["arguments"],
-        )
-
-        self.messages.append(reply)
-
-        self.messages.append(
-            {
-                "role": "user",
-                "content": f"""
+        return f"""
 Tool Result
 
 {result}
@@ -77,9 +63,58 @@ If the user requested a code review, include:
 
 If the user requested something else,
 answer normally.
-""",
+"""
+
+    def chat(self, user_message: str) -> str:
+        """
+        Process a user message and return
+        the assistant response.
+        """
+
+        # Step 1 - Add user message
+
+        self.messages.append(
+            {
+                "role": "user",
+                "content": user_message,
             }
         )
+
+        # Step 2 - Ask the LLM
+
+        reply = ask_llm(self.messages)
+
+        tool_call = self._parse_tool_call(reply.content)
+
+        # Step 3 - No tool required
+
+        if tool_call is None:
+
+            self.messages.append(reply)
+
+            return reply.content
+
+        # Step 4 - Execute tool
+
+        result = execute(
+            tool_call["tool"],
+            tool_call["arguments"],
+        )
+
+        # Step 5 - Save assistant tool request
+
+        self.messages.append(reply)
+
+        # Step 6 - Send tool result back to LLM
+
+        self.messages.append(
+            {
+                "role": "user",
+                "content": self._tool_result_prompt(result),
+            }
+        )
+
+        # Step 7 - Generate final answer
 
         final = ask_llm(self.messages)
 
