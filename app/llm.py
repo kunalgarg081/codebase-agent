@@ -1,6 +1,7 @@
 from openai import OpenAI
 from typing import Any
 from app.config import API_KEY, BASE_URL, MODEL
+from app.tools import TOOL_SCHEMAS
 
 client = OpenAI(
     api_key=API_KEY,
@@ -17,6 +18,8 @@ def ask_llm(messages: list[dict[str, Any]]):
         response = client.chat.completions.create(
             model=MODEL,
             messages=messages,
+            tools=TOOL_SCHEMAS,
+            tool_choice="auto",
             temperature=0.2,
         )
 

@@ -210,11 +210,107 @@ def review_file(path: str) -> str:
 
 
 TOOLS = {
-    "read_file": read_file,
-    "list_directory": list_directory,
-    "search_text": search_text,
-    "list_python_functions": list_python_functions,
-    "get_function_source": get_function_source,
-    "get_project_context": get_project_context,
-    "review_file": review_file,
+    "read_file": {
+        "function": read_file,
+        "description": "Read the contents of a file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to the file."
+                }
+            },
+            "required": ["path"]
+        }
+    },
+
+    "list_directory": {
+        "function": list_directory,
+        "description": "List files and folders inside a directory.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Directory relative to the workspace."
+                }
+            }
+        }
+    },
+
+    "search_text": {
+        "function": search_text,
+        "description": "Search every project file for a keyword.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "type": "string",
+                    "description": "Keyword to search for."
+                }
+            },
+            "required": ["keyword"]
+        }
+    },
+
+    "list_python_functions": {
+        "function": list_python_functions,
+        "description": "List all Python functions in the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+
+    "get_function_source": {
+        "function": get_function_source,
+        "description": "Return the source code of a Python function.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "function_name": {
+                    "type": "string",
+                    "description": "Name of the function."
+                }
+            },
+            "required": ["function_name"]
+        }
+    },
+
+    "get_project_context": {
+        "function": get_project_context,
+        "description": "Collect important project files for summarization.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+
+    "review_file": {
+        "function": review_file,
+        "description": "Read a file for AI code review.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to the file."
+                }
+            },
+            "required": ["path"]
+        }
+    },
 }
+
+TOOL_SCHEMAS = [
+    {
+        "type": "function",
+        "function": {
+            "name": name,
+            "description": tool["description"],
+            "parameters": tool["parameters"],
+        },
+    }
+    for name, tool in TOOLS.items()
+]
