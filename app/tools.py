@@ -18,7 +18,12 @@ def read_file(path: str) -> str:
     Read a file from the workspace.
     """
 
-    file = workspace / path
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+    
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
 
     if not file.exists():
         return f"File '{path}' does not exist."
@@ -37,7 +42,12 @@ def write_file(path: str, content: str) -> str:
     Creates parent directories if needed.
     """
 
-    file = workspace / path
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
 
     try:
 
@@ -61,7 +71,12 @@ def list_directory(path: str = ".") -> str:
     List files and folders inside a directory.
     """
 
-    directory = workspace / path
+    directory = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(directory).startswith(str(workspace_root)):
+        return "Access denied."
 
     if not directory.exists():
         return f"Directory '{path}' does not exist."

@@ -5,6 +5,12 @@ from app.prompts import SYSTEM_PROMPT
 from app.tool_executor import execute
 
 MAX_TOOL_CALLS = 5
+MAX_HISTORY = 20
+WRITE_TOOLS = {
+    "write_file",
+}
+DEBUG = False
+
 class Agent:
 
     def __init__(self):
@@ -16,74 +22,84 @@ class Agent:
             }
         ]
 
-    
-    def _tool_result_prompt(self, result: str) -> str:
+    def _trim_history(self):
         """
-        Create the follow-up prompt after
-        executing a tool.
+        Keep the system prompt and only
+        the most recent conversation.
         """
 
-        return f"""
-Tool Result
+        if len(self.messages) <= MAX_HISTORY:
+            return
 
-{result}
+        system = self.messages[0]
 
-Answer the user's request using the tool result.
+        recent = self.messages[-MAX_HISTORY:]
 
-If the user requested a code review, include:
-
-1. Overall Score (out of 10)
-2. Strengths
-3. Weaknesses
-4. Suggestions
-5. Refactored Example (if useful)
-
-If the user requested something else,
-answer normally.
-"""
-
+        self.messages = [
+            system,
+            *recent,
+        ]
 
     def chat(self, user_message: str) -> str:
         """
         Process a user message using a multi-step
         tool-calling loop.
         """
-
+    
         self.messages.append(
             {
                 "role": "user",
                 "content": user_message,
             }
         )
-
-        for _ in range(MAX_TOOL_CALLS):
-
+    
+        for step in range(MAX_TOOL_CALLS):
+        
             reply = ask_llm(self.messages)
-            print(f"\n--- Tool Calls: {len(reply.tool_calls or [])} ---")
-            # No more tool calls -> Final Answer
+    
+            if DEBUG:
+                print(f"\n--- Step {step + 1} ---")
+                print(f"Tool Calls: {len(reply.tool_calls or [])}")
+    
+            # Final response
             if not reply.tool_calls:
-
+            
                 self.messages.append(reply)
-
+    
+                self._trim_history()
+    
                 return reply.content
-
-            # Save assistant message containing tool calls
+    
+            # Save assistant message
             self.messages.append(reply)
-
-            # Execute every requested tool
+    
+            # Execute requested tools
             for tool_call in reply.tool_calls:
-
+            
                 tool_name = tool_call.function.name
-
+    
                 arguments = json.loads(
                     tool_call.function.arguments
                 )
-
+    
+                # Ask before modifying files
+                if tool_name in WRITE_TOOLS:
+                
+                    if not self._confirm_write(
+                        arguments.get("path", "")
+                    ):
+                        return "Operation cancelled by user."
+    
                 result = execute(
                     tool_name,
                     arguments,
                 )
-                print(f"Executed: {tool_name}({arguments})")
+    
+                if DEBUG:
+                    print(
+                        f"Executed: {tool_name}({arguments})"
+                    )
+    
                 self.messages.append(
                     {
                         "role": "tool",
@@ -91,8 +107,11 @@ answer normally.
                         "content": str(result),
                     }
                 )
-
+    
+        self._trim_history()
+    
         return (
             "Maximum tool call limit reached. "
             "Unable to complete the request."
         )
+    
