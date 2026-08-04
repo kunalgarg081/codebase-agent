@@ -4,7 +4,7 @@ from app.llm import ask_llm
 from app.prompts import SYSTEM_PROMPT
 from app.tool_executor import execute
 
-
+MAX_TOOL_CALLS = 5
 class Agent:
 
     def __init__(self):
@@ -42,13 +42,12 @@ If the user requested something else,
 answer normally.
 """
 
+
     def chat(self, user_message: str) -> str:
         """
-        Process a user message and return
-        the assistant response.
+        Process a user message using a multi-step
+        tool-calling loop.
         """
-
-        # Step 1 - Add user message
 
         self.messages.append(
             {
@@ -57,55 +56,43 @@ answer normally.
             }
         )
 
-        # Step 2 - Ask the LLM
+        for _ in range(MAX_TOOL_CALLS):
 
-        reply = ask_llm(self.messages)
-        
-        print("\n========== LLM RESPONSE ==========")
-        print(reply)
-        print("==================================\n")
+            reply = ask_llm(self.messages)
+            print(f"\n--- Tool Calls: {len(reply.tool_calls or [])} ---")
+            # No more tool calls -> Final Answer
+            if not reply.tool_calls:
 
-        # Step 3 - No tool required
+                self.messages.append(reply)
 
-        if not reply.tool_calls:
+                return reply.content
 
+            # Save assistant message containing tool calls
             self.messages.append(reply)
 
-            return reply.content
+            # Execute every requested tool
+            for tool_call in reply.tool_calls:
 
-        # Step 4 - Execute first tool
+                tool_name = tool_call.function.name
 
-        tool_call = reply.tool_calls[0]
+                arguments = json.loads(
+                    tool_call.function.arguments
+                )
 
-        tool_name = tool_call.function.name
+                result = execute(
+                    tool_name,
+                    arguments,
+                )
+                print(f"Executed: {tool_name}({arguments})")
+                self.messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": str(result),
+                    }
+                )
 
-        arguments = json.loads(
-            tool_call.function.arguments
+        return (
+            "Maximum tool call limit reached. "
+            "Unable to complete the request."
         )
-
-        result = execute(
-            tool_name,
-            arguments,
-        )
-
-        # Step 5 - Save assistant message
-
-        self.messages.append(reply)
-
-        # Step 6 - Send tool result
-
-        self.messages.append(
-            {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": str(result),
-            }
-        )
-
-        # Step 7 - Ask the LLM again
-
-        final = ask_llm(self.messages)
-
-        self.messages.append(final)
-
-        return final.content
