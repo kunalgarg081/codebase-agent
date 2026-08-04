@@ -1,6 +1,7 @@
 import ast
 from pathlib import Path
-
+import subprocess
+import sys
 from app.config import WORKSPACE
 
 workspace = Path(WORKSPACE)
@@ -65,6 +66,63 @@ def write_file(path: str, content: str) -> str:
 
     except Exception as e:
         return f"Failed to write '{path}': {e}"
+
+
+def run_python(path: str) -> str:
+    """
+    Execute a Python file inside the workspace.
+    """
+
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if file.suffix != ".py":
+        return "Only Python files can be executed."
+
+    try:
+
+        result = subprocess.run(
+            [sys.executable, str(file)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=workspace,
+        )
+
+        output = []
+
+        output.append(
+            f"Exit Code: {result.returncode}"
+        )
+
+        if result.stdout:
+
+            output.append(
+                f"\nSTDOUT:\n{result.stdout}"
+            )
+
+        if result.stderr:
+
+            output.append(
+                f"\nSTDERR:\n{result.stderr}"
+            )
+
+        return "\n".join(output)
+
+    except subprocess.TimeoutExpired:
+
+        return "Execution timed out after 10 seconds."
+
+    except Exception as e:
+
+        return str(e)
 
 def list_directory(path: str = ".") -> str:
     """
@@ -359,6 +417,20 @@ TOOLS = {
                 "path",
                 "content"
             ]
+        }
+    },
+    "run_python": {
+        "function": run_python,
+        "description": "Execute a Python file inside the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to a Python file."
+                }
+            },
+            "required": ["path"]
         }
     },
 }
