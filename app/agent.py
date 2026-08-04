@@ -47,49 +47,53 @@ answer normally.
         Process a user message and return
         the assistant response.
         """
-    
+
         # Step 1 - Add user message
-    
+
         self.messages.append(
             {
                 "role": "user",
                 "content": user_message,
             }
         )
-    
+
         # Step 2 - Ask the LLM
-    
+
         reply = ask_llm(self.messages)
-    
-        # Step 3 - No tool required
-    
-        if not reply.tool_calls:
         
+        print("\n========== LLM RESPONSE ==========")
+        print(reply)
+        print("==================================\n")
+
+        # Step 3 - No tool required
+
+        if not reply.tool_calls:
+
             self.messages.append(reply)
-    
+
             return reply.content
-    
+
         # Step 4 - Execute first tool
-    
+
         tool_call = reply.tool_calls[0]
-    
+
         tool_name = tool_call.function.name
-    
+
         arguments = json.loads(
             tool_call.function.arguments
         )
-    
+
         result = execute(
             tool_name,
             arguments,
         )
-    
+
         # Step 5 - Save assistant message
-    
+
         self.messages.append(reply)
-    
+
         # Step 6 - Send tool result
-    
+
         self.messages.append(
             {
                 "role": "tool",
@@ -97,11 +101,11 @@ answer normally.
                 "content": str(result),
             }
         )
-    
+
         # Step 7 - Ask the LLM again
-    
+
         final = ask_llm(self.messages)
-    
+
         self.messages.append(final)
-    
+
         return final.content
