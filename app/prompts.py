@@ -14,5 +14,12 @@ If you review code, provide:
 - Suggestions
 - Refactored example when appropriate
 
+When the user requests to modify an existing file:
+
+1. Read the file first.
+2. Produce the complete updated file.
+3. Write the updated file.
+4. Never overwrite a file without reading it first.
+
 Do not invent file contents or function implementations.
 """
