@@ -31,6 +31,30 @@ def read_file(path: str) -> str:
         errors="ignore",
     )
 
+def write_file(path: str, content: str) -> str:
+    """
+    Write content to a file inside the workspace.
+    Creates parent directories if needed.
+    """
+
+    file = workspace / path
+
+    try:
+
+        file.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        file.write_text(
+            content,
+            encoding="utf-8",
+        )
+
+        return f"Successfully wrote '{path}'."
+
+    except Exception as e:
+        return f"Failed to write '{path}': {e}"
 
 def list_directory(path: str = ".") -> str:
     """
@@ -299,6 +323,27 @@ TOOLS = {
                 }
             },
             "required": ["path"]
+        }
+    },
+    "write_file": {
+        "function": write_file,
+        "description": "Create or overwrite a file inside the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path of the file."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "Content to write into the file."
+                }
+            },
+            "required": [
+                "path",
+                "content"
+            ]
         }
     },
 }
