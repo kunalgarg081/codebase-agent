@@ -7,6 +7,22 @@ from app.config import WORKSPACE
 workspace = Path(WORKSPACE)
 
 
+def resolve_workspace_path(path: str) -> Path | None:
+    """
+    Resolve a path inside the workspace.
+    Returns None if the path escapes the workspace.
+    """
+
+    resolved = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(resolved).startswith(str(workspace_root)):
+        return None
+
+    return resolved
+
+
 def iter_python_files():
     """
     Iterate through all Python files in the workspace.
@@ -19,11 +35,9 @@ def read_file(path: str) -> str:
     Read a file from the workspace.
     """
 
-    file = (workspace / path).resolve()
+    file = resolve_workspace_path(path)
 
-    workspace_root = workspace.resolve()
-    
-    if not str(file).startswith(str(workspace_root)):
+    if file is None:
         return "Access denied."
 
     if not file.exists():
@@ -43,11 +57,9 @@ def write_file(path: str, content: str) -> str:
     Creates parent directories if needed.
     """
 
-    file = (workspace / path).resolve()
-
-    workspace_root = workspace.resolve()
-
-    if not str(file).startswith(str(workspace_root)):
+    file = resolve_workspace_path(path)
+    
+    if file is None:
         return "Access denied."
 
     try:
@@ -127,11 +139,9 @@ def list_directory(path: str = ".") -> str:
     List files and folders inside a directory.
     """
 
-    directory = (workspace / path).resolve()
-
-    workspace_root = workspace.resolve()
-
-    if not str(directory).startswith(str(workspace_root)):
+    directory = resolve_workspace_path(path)
+    
+    if directory is None:
         return "Access denied."
 
     if not directory.exists():
@@ -263,7 +273,20 @@ def get_project_context() -> str:
 
     context = []
 
-    for file in workspace.rglob("*"):
+    important_files = []
+
+    for name in [
+        "README.md",
+        "main.py",
+        "requirements.txt",
+    ]:
+        file = workspace / name
+        if file.exists():
+            important_files.append(file)
+
+    important_files.extend(workspace.rglob("*.py"))
+
+    for file in important_files:
 
         if not file.is_file():
             continue
@@ -431,6 +454,7 @@ TOOLS = {
             "required": ["path"]
         }
     },
+    
 }
 
 TOOL_SCHEMAS = [

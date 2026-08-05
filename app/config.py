@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
+MAX_TOOL_CALLS = 5
+MAX_HISTORY = 20
+DEBUG = True
 
 def get_env(key: str, default=None, required: bool = False):
     value = os.getenv(key, default)

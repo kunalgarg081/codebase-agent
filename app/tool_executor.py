@@ -1,5 +1,5 @@
 from app.tools import TOOLS
-
+from app.tool_result import ToolResult
 
 def execute(tool_name: str, arguments: dict):
     """
@@ -14,14 +14,24 @@ def execute(tool_name: str, arguments: dict):
     function = tool["function"]
 
     try:
-        return function(**arguments)
+        return ToolResult(
+            success=True,
+            output=str(function(**arguments)),
+        )
 
     except TypeError as e:
-        return (
-            f"Invalid arguments for tool '{tool_name}': {e}"
+        return ToolResult(
+            success=False,
+            output=(
+                f"Invalid arguments for tool "
+                f"'{tool_name}': {e}"
+            ),
         )
 
     except Exception as e:
-        return (
-            f"Error while executing '{tool_name}': {e}"
+        return ToolResult(
+            success=False,
+            output=(
+                f"Error while executing '{tool_name}': {e}"
+            ),
         )
