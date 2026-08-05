@@ -4,6 +4,12 @@ from app.llm import ask_llm
 from app.prompts import SYSTEM_PROMPT
 from app.tool_executor import execute
 
+MAX_TOOL_CALLS = 5
+MAX_HISTORY = 20
+WRITE_TOOLS = {
+    "write_file",
+}
+DEBUG = False
 
 class Agent:
 
@@ -16,62 +22,40 @@ class Agent:
             }
         ]
 
-    def _parse_tool_call(self, content: str) -> dict | None:
+    def _trim_history(self):
         """
-        Parse the LLM response and determine
-        whether it is a valid tool call.
-        """
-
-        try:
-
-            data = json.loads(content)
-
-            if not isinstance(data, dict):
-                return None
-
-            if "tool" not in data:
-                return None
-
-            if "arguments" not in data:
-                return None
-
-            return data
-
-        except json.JSONDecodeError:
-            return None
-
-    def _tool_result_prompt(self, result: str) -> str:
-        """
-        Create the follow-up prompt after
-        executing a tool.
+        Keep the system prompt and only
+        the most recent conversation.
         """
 
-        return f"""
-Tool Result
+        if len(self.messages) <= MAX_HISTORY:
+            return
 
-{result}
+        system = self.messages[0]
 
-Answer the user's request using the tool result.
+        recent = self.messages[-MAX_HISTORY:]
 
-If the user requested a code review, include:
+        self.messages = [
+            system,
+            *recent,
+        ]
 
-1. Overall Score (out of 10)
-2. Strengths
-3. Weaknesses
-4. Suggestions
-5. Refactored Example (if useful)
-
-If the user requested something else,
-answer normally.
-"""
-
+    def _confirm_write(self, path: str) -> bool:
+        """
+        Ask the user before modifying a file.
+        """
+    
+        confirm = input(
+            f"\n⚠️  write_file wants to modify '{path}'.\n"
+            "Allow? (y/n): "
+        ).strip().lower()
+    
+        return confirm == "y"
     def chat(self, user_message: str) -> str:
         """
-        Process a user message and return
-        the assistant response.
+        Process a user message using a multi-step
+        tool-calling loop.
         """
-
-        # Step 1 - Add user message
 
         self.messages.append(
             {
@@ -80,44 +64,64 @@ answer normally.
             }
         )
 
-        # Step 2 - Ask the LLM
+        for step in range(MAX_TOOL_CALLS):
 
-        reply = ask_llm(self.messages)
+            reply = ask_llm(self.messages)
 
-        tool_call = self._parse_tool_call(reply.content)
+            if DEBUG:
+                print(f"\n--- Step {step + 1} ---")
+                print(f"Tool Calls: {len(reply.tool_calls or [])}")
 
-        # Step 3 - No tool required
+            # Final response
+            if not reply.tool_calls:
 
-        if tool_call is None:
+                self.messages.append(reply)
 
+                self._trim_history()
+
+                return reply.content
+
+            # Save assistant message
             self.messages.append(reply)
 
-            return reply.content
+            # Execute requested tools
+            for tool_call in reply.tool_calls:
 
-        # Step 4 - Execute tool
+                tool_name = tool_call.function.name
 
-        result = execute(
-            tool_call["tool"],
-            tool_call["arguments"],
+                arguments = json.loads(
+                    tool_call.function.arguments
+                )
+
+                # Ask before modifying files
+                if tool_name in WRITE_TOOLS:
+
+                    if not self._confirm_write(
+                        arguments.get("path", "")
+                    ):
+                        return "Operation cancelled by user."
+
+                result = execute(
+                    tool_name,
+                    arguments,
+                )
+
+                if DEBUG:
+                    print(
+                        f"Executed: {tool_name}({arguments})"
+                    )
+
+                self.messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": str(result),
+                    }
+                )
+
+        self._trim_history()
+
+        return (
+            "Maximum tool call limit reached. "
+            "Unable to complete the request."
         )
-
-        # Step 5 - Save assistant tool request
-
-        self.messages.append(reply)
-
-        # Step 6 - Send tool result back to LLM
-
-        self.messages.append(
-            {
-                "role": "user",
-                "content": self._tool_result_prompt(result),
-            }
-        )
-
-        # Step 7 - Generate final answer
-
-        final = ask_llm(self.messages)
-
-        self.messages.append(final)
-
-        return final.content

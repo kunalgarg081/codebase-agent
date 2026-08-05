@@ -1,6 +1,7 @@
 import ast
 from pathlib import Path
-
+import subprocess
+import sys
 from app.config import WORKSPACE
 
 workspace = Path(WORKSPACE)
@@ -18,7 +19,12 @@ def read_file(path: str) -> str:
     Read a file from the workspace.
     """
 
-    file = workspace / path
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+    
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
 
     if not file.exists():
         return f"File '{path}' does not exist."
@@ -31,13 +37,104 @@ def read_file(path: str) -> str:
         errors="ignore",
     )
 
+def write_file(path: str, content: str) -> str:
+    """
+    Write content to a file inside the workspace.
+    Creates parent directories if needed.
+    """
+
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
+
+    try:
+
+        file.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        file.write_text(
+            content,
+            encoding="utf-8",
+        )
+
+        return f"Successfully wrote '{path}'."
+
+    except Exception as e:
+        return f"Failed to write '{path}': {e}"
+
+
+def run_python(path: str) -> str:
+    """
+    Execute a Python file inside the workspace.
+    """
+
+    file = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(file).startswith(str(workspace_root)):
+        return "Access denied."
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if file.suffix != ".py":
+        return "Only Python files can be executed."
+
+    try:
+
+        result = subprocess.run(
+            [sys.executable, str(file)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=workspace,
+        )
+
+        output = []
+
+        output.append(
+            f"Exit Code: {result.returncode}"
+        )
+
+        if result.stdout:
+
+            output.append(
+                f"\nSTDOUT:\n{result.stdout}"
+            )
+
+        if result.stderr:
+
+            output.append(
+                f"\nSTDERR:\n{result.stderr}"
+            )
+
+        return "\n".join(output)
+
+    except subprocess.TimeoutExpired:
+
+        return "Execution timed out after 10 seconds."
+
+    except Exception as e:
+
+        return str(e)
 
 def list_directory(path: str = ".") -> str:
     """
     List files and folders inside a directory.
     """
 
-    directory = workspace / path
+    directory = (workspace / path).resolve()
+
+    workspace_root = workspace.resolve()
+
+    if not str(directory).startswith(str(workspace_root)):
+        return "Access denied."
 
     if not directory.exists():
         return f"Directory '{path}' does not exist."
@@ -210,11 +307,142 @@ def review_file(path: str) -> str:
 
 
 TOOLS = {
-    "read_file": read_file,
-    "list_directory": list_directory,
-    "search_text": search_text,
-    "list_python_functions": list_python_functions,
-    "get_function_source": get_function_source,
-    "get_project_context": get_project_context,
-    "review_file": review_file,
+    "read_file": {
+        "function": read_file,
+        "description": "Read the contents of a file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to the file."
+                }
+            },
+            "required": ["path"]
+        }
+    },
+
+    "list_directory": {
+        "function": list_directory,
+        "description": "List files and folders inside a directory.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Directory relative to the workspace."
+                }
+            }
+        }
+    },
+
+    "search_text": {
+        "function": search_text,
+        "description": "Search every project file for a keyword.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "type": "string",
+                    "description": "Keyword to search for."
+                }
+            },
+            "required": ["keyword"]
+        }
+    },
+
+    "list_python_functions": {
+        "function": list_python_functions,
+        "description": "List all Python functions in the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+
+    "get_function_source": {
+        "function": get_function_source,
+        "description": "Return the source code of a Python function.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "function_name": {
+                    "type": "string",
+                    "description": "Name of the function."
+                }
+            },
+            "required": ["function_name"]
+        }
+    },
+
+    "get_project_context": {
+        "function": get_project_context,
+        "description": "Collect important project files for summarization.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+
+    "review_file": {
+        "function": review_file,
+        "description": "Read a file for AI code review.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to the file."
+                }
+            },
+            "required": ["path"]
+        }
+    },
+    "write_file": {
+        "function": write_file,
+        "description": "Create or overwrite a file inside the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path of the file."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "Content to write into the file."
+                }
+            },
+            "required": [
+                "path",
+                "content"
+            ]
+        }
+    },
+    "run_python": {
+        "function": run_python,
+        "description": "Execute a Python file inside the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Relative path to a Python file."
+                }
+            },
+            "required": ["path"]
+        }
+    },
 }
+
+TOOL_SCHEMAS = [
+    {
+        "type": "function",
+        "function": {
+            "name": name,
+            "description": tool["description"],
+            "parameters": tool["parameters"],
+        },
+    }
+    for name, tool in TOOLS.items()
+]

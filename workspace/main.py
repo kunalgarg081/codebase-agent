@@ -1,9 +1,9 @@
-DATABASE_URL = "sqlite.db"
+DATABASE_URL: str = "sqlite.db"
 
-def greet(name):
+def greet(name: str) -> str:
     return f"Hello {name}"
 
-def hello():
+def hello() -> str:
     return "Hi"
 
 print(greet("Kunal"))
