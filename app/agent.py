@@ -1,15 +1,19 @@
 import json
-
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Confirm
 from app.llm import ask_llm
 from app.prompts import SYSTEM_PROMPT
 from app.tool_executor import execute
+
+console = Console()
 
 MAX_TOOL_CALLS = 5
 MAX_HISTORY = 20
 WRITE_TOOLS = {
     "write_file",
 }
-DEBUG = False
+DEBUG = True
 
 class Agent:
 
@@ -45,12 +49,22 @@ class Agent:
         Ask the user before modifying a file.
         """
     
-        confirm = input(
-            f"\n⚠️  write_file wants to modify '{path}'.\n"
-            "Allow? (y/n): "
-        ).strip().lower()
+        console.print()
     
-        return confirm == "y"
+        console.print(
+            Panel(
+                f"[bold yellow]Tool[/bold yellow] : write_file\n"
+                f"[bold yellow]File[/bold yellow] : {path}",
+                title="[bold red]⚠ File Modification[/bold red]",
+                border_style="red",
+            )
+        )
+    
+        console.print()
+    
+        return Confirm.ask(
+            "[bold cyan]Approve this operation?[/bold cyan]"
+        )
     def chat(self, user_message: str) -> str:
         """
         Process a user message using a multi-step
@@ -69,8 +83,9 @@ class Agent:
             reply = ask_llm(self.messages)
 
             if DEBUG:
-                print(f"\n--- Step {step + 1} ---")
-                print(f"Tool Calls: {len(reply.tool_calls or [])}")
+                print("\n========== RAW MODEL RESPONSE ==========")
+                print(reply)
+                print("========================================\n")
 
             # Final response
             if not reply.tool_calls:

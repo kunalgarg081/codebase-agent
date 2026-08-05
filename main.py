@@ -1,4 +1,6 @@
 from rich.console import Console
+from rich.panel import Panel
+from rich.markdown import Markdown
 
 from app.agent import Agent
 
@@ -7,15 +9,46 @@ agent = Agent()
 
 
 def show_banner():
-    console.print("[bold green]🚀 Codebase Agent v1.0[/bold green]\n")
+    console.print()
 
-    console.print("[bold cyan]Example Commands:[/bold cyan]")
-    console.print("  • Describe this project")
-    console.print("  • Explain main.py")
-    console.print("  • Explain greet")
-    console.print("  • List all functions")
-    console.print("  • Review main.py")
-    console.print("  • Exit\n")
+    console.print(
+        Panel.fit(
+            "[bold cyan]🚀 Codebase Agent v2.1[/bold cyan]\n\n"
+            "[bold]Examples[/bold]\n"
+            "• Describe this project\n"
+            "• Explain main.py\n"
+            "• Review calculator.py\n"
+            "• Run main.py\n"
+            "• Create hello.py\n"
+            "• Exit",
+            border_style="cyan",
+        )
+    )
+
+
+def get_multiline_input() -> str:
+    """
+    Read multiline input until the user types END.
+    """
+
+    console.print()
+    console.print(
+        "[bold green]🤖 You[/bold green] "
+        "[dim](Finish with END on a new line)[/dim]"
+    )
+
+    lines = []
+
+    while True:
+
+        line = input()
+
+        if line.strip() == "END":
+            break
+
+        lines.append(line)
+
+    return "\n".join(lines).strip()
 
 
 def main():
@@ -26,21 +59,34 @@ def main():
 
         while True:
 
-            user = input("🤖 You > ").strip()
+            user = get_multiline_input()
 
             if not user:
                 continue
 
             if user.lower() in {"exit", "quit"}:
-                console.print("\n👋 Goodbye!")
+
+                console.print()
+                console.print("[bold red]👋 Goodbye![/bold red]")
+
                 break
 
             response = agent.chat(user)
 
-            console.print(f"\n[cyan]🤖 Agent[/cyan]\n{response}\n")
+            console.print()
+
+            console.print(
+                Panel(
+                    Markdown(response),
+                    title="🤖 Agent",
+                    border_style="green",
+                )
+            )
 
     except KeyboardInterrupt:
-        console.print("\n\n👋 Goodbye!")
+
+        console.print()
+        console.print("[bold red]👋 Goodbye![/bold red]")
 
 
 if __name__ == "__main__":

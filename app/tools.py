@@ -96,24 +96,22 @@ def run_python(path: str) -> str:
             cwd=workspace,
         )
 
-        output = []
-
-        output.append(
-            f"Exit Code: {result.returncode}"
-        )
-
+        output = [
+            "Python Execution",
+            "================",
+            f"File: {path}",
+            f"Exit Code: {result.returncode}",
+        ]
+        
+        
         if result.stdout:
-
-            output.append(
-                f"\nSTDOUT:\n{result.stdout}"
-            )
-
+            output.append("\nSTDOUT:")
+            output.append(result.stdout)
+        
         if result.stderr:
-
-            output.append(
-                f"\nSTDERR:\n{result.stderr}"
-            )
-
+            output.append("\nSTDERR:")
+            output.append(result.stderr)
+        
         return "\n".join(output)
 
     except subprocess.TimeoutExpired:
