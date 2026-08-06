@@ -62,7 +62,8 @@ Examples:
 
 ## Directory Operations
 
-- [ ] List workspace
+- [x] List workspace
+- [x] List all files recursively
 
 ---
 

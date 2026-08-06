@@ -67,8 +67,6 @@ The tools interact with the project files.
 
 ---
 
----
-
 # Command Line Interface (CLI)
 
 The application provides two input modes.
@@ -265,6 +263,61 @@ Avoid premature optimization.
 
 ---
 
+# Design Principles
+
+The project follows several architectural principles.
+
+## Tools return data
+
+Tools should return structured Python data whenever possible.
+
+The LLM is responsible for converting that data into natural language for the user.
+
+Keeping these responsibilities separate makes tools easier to test and reuse.
+
+---
+
+## Keep Version 1 Simple
+
+New features should solve one problem well.
+
+Additional options and flexibility should only be introduced after a real need is identified through testing.
+
+---
+
+## Test Before Expanding
+
+Every feature follows the same lifecycle:
+
+Requirement
+
+↓
+
+Design
+
+↓
+
+Implementation
+
+↓
+
+Manual Testing
+
+↓
+
+Unit Tests
+
+↓
+
+Documentation
+
+↓
+
+Git Commit
+
+Only after a feature completes this cycle should the next feature begin.
+
+---
 # Learning Goal
 
 This project is a learning project.
@@ -283,3 +336,32 @@ The objective is not only to build a capable Codebase Agent but also to understa
 Every feature should be implemented in a way that explains both **how** it works and **why** it was designed that way.
 
 The journey of building the agent is as important as the final product.
+
+# Repository Intelligence
+
+Repository Intelligence is the next stage of the project.
+
+Instead of operating on individual files only, the agent gradually learns the structure of the entire repository.
+
+Current repository tools:
+
+- `list_directory()` — Lists the contents of a single directory.
+- `list_files()` — Recursively lists every file in the workspace while ignoring cache and hidden directories.
+
+Design decisions:
+
+- Search recursively through the workspace.
+- Return relative paths instead of absolute paths.
+- Ignore implementation directories such as `.git`, `__pycache__`, `.pytest_cache`, and `.vscode`.
+- Return structured data (`list[str]`) instead of formatted text.
+- Keep Version 1 simple. Filtering by extension or directory can be added later if required.
+
+This design allows future tools such as:
+
+- list_classes()
+- list_imports()
+- find_symbol()
+- find_references()
+
+to reuse the same repository understanding.
+

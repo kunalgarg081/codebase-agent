@@ -8,7 +8,7 @@ v2.1
 
 Certification Date: 2026-08-06
 
-Status: 🟡 In Progress
+Status: 🟢 Active Certification
 
 ---
 
@@ -16,7 +16,7 @@ Status: 🟡 In Progress
 
 | Test | Result |
 |------|--------|
-| pytest | ✅ PASS (9/9) |
+| pytest | ✅ PASS (12/12) |
 
 ---
 
@@ -33,6 +33,18 @@ Status: 🟡 In Progress
 | Run Python | ✅ PASS | Executed successfully with correct output and exit code. |
 | List Python Functions | ✅ PASS | AST tool returned all functions correctly. |
 | Get Function Source | ✅ PASS | Returned exact function source. |
+
+---
+
+---
+
+# v2.2 Feature Certification
+
+| Feature | Result | Notes |
+|---------|--------|-------|
+| list_files() | ✅ PASS | Recursive listing works correctly. |
+| Relative Paths | ✅ PASS | Returns workspace-relative paths only. |
+| Hidden Directory Filtering | ✅ PASS | Ignores `.git`, `__pycache__`, `.pytest_cache`, and `.vscode`. |
 
 ---
 

@@ -153,6 +153,40 @@ def list_directory(path: str = ".") -> str:
     )
 
 
+def list_files() -> list[str]:
+    """
+    Recursively list all files in the workspace.
+    """
+
+    ignored_dirs = {
+        ".git",
+        "__pycache__",
+        ".pytest_cache",
+        ".vscode",
+    }
+
+    files = []
+
+    for file in workspace.rglob("*"):
+
+        if not file.is_file():
+            continue
+
+        if any(
+            part in ignored_dirs
+            for part in file.parts
+        ):
+            continue
+
+        files.append(
+            str(file.relative_to(workspace))
+        )
+
+    files.sort()
+
+    return files
+
+
 def search_text(keyword: str) -> str:
     """
     Search every project file for a keyword.
@@ -454,7 +488,14 @@ TOOLS = {
             "required": ["path"]
         }
     },
-    
+    "list_files": {
+        "function": list_files,
+        "description": "Recursively list all files in the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
 }
 
 TOOL_SCHEMAS = [

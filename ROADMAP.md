@@ -27,16 +27,21 @@ v2.1.1
 - ✅ Testing documentation
 - ✅ Certification process
 - ✅ CLI `/code` mode for multiline prompts
+- ✅ Recursive file listing (`list_files()`)
 
 ---
 
 # In Progress
 
-- 🟡 v2.1 Certification
-    - Automated tests
-    - Manual tool testing
-    - Integration testing
-    - Release validation
+- 🟡 v2.2 - Repository Intelligence
+
+Current Progress
+
+- ✅ list_files()
+- ⏳ list_classes()
+- ⏳ list_imports()
+- ⏳ find_symbol()
+- ⏳ find_references()
 
 ---
 

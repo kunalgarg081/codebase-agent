@@ -1,11 +1,15 @@
+from pathlib import Path
+
 from app.tools import (
     read_file,
     write_file,
     list_directory,
+    list_files,
     search_text,
     list_python_functions,
     get_function_source,
     run_python,
+    workspace,
 )
 
 
@@ -72,3 +76,34 @@ def test_run_python():
     assert "Exit Code: 0" in result
 
     assert "Hello World" in result
+
+
+def test_list_files():
+
+    result = list_files()
+
+    assert "hello.py" in result
+    assert "greet.py" in result
+
+
+def test_list_files_returns_relative_paths():
+
+    result = list_files()
+
+    for path in result:
+        assert not Path(path).is_absolute()
+
+
+def test_list_files_ignores_hidden_directories():
+
+    hidden = workspace / ".git"
+    hidden.mkdir(exist_ok=True)
+
+    secret = hidden / "secret.py"
+    secret.write_text("print('secret')")
+
+    result = list_files()
+
+    assert ".git/secret.py" not in result
+
+    secret.unlink()
