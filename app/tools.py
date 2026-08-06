@@ -303,6 +303,63 @@ def list_classes() -> list[dict]:
         key=lambda item: (item["file"], item["class"])
     )
 
+
+def list_imports() -> list[dict]:
+    """
+    List all imports in the workspace.
+    """
+
+    results = []
+
+    for file in iter_python_files():
+
+        try:
+
+            source = file.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            )
+
+            tree = ast.parse(source)
+
+            for node in ast.walk(tree):
+
+                if isinstance(node, ast.Import):
+
+                    for alias in node.names:
+
+                        results.append(
+                            {
+                                "file": str(file.relative_to(workspace)),
+                                "module": alias.name,
+                                "alias": alias.asname,
+                            }
+                        )
+
+                elif isinstance(node, ast.ImportFrom):
+
+                    results.append(
+                        {
+                            "file": str(file.relative_to(workspace)),
+                            "module": node.module,
+                            "imports": [
+                                alias.name
+                                for alias in node.names
+                            ],
+                        }
+                    )
+
+        except Exception:
+            continue         
+
+    return sorted(
+        results,
+        key=lambda item: (
+            item["file"],
+            item["module"] or "",
+        ),
+    )
+
 def get_function_source(function_name: str) -> str:
     """
     Return the complete source code of a function.
@@ -536,6 +593,14 @@ TOOLS = {
     "list_classes": {
         "function": list_classes,
         "description": "List all Python classes in the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+    "list_imports": {
+        "function": list_imports,
+        "description": "List all imports in the workspace.",
         "parameters": {
             "type": "object",
             "properties": {}

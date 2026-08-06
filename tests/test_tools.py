@@ -11,6 +11,7 @@ from app.tools import (
     run_python,
     workspace,
     list_classes,
+    list_imports,
 )
 
 
@@ -141,3 +142,40 @@ def test_list_classes_relative_paths():
     for item in result:
 
         assert not Path(item["file"]).is_absolute()
+
+
+def test_list_imports():
+
+    result = list_imports()
+
+    modules = [
+        item["module"]
+        for item in result
+    ]
+
+    assert "math" in modules
+    assert "os" in modules
+    assert "pathlib" in modules
+    assert "greet" in modules
+
+
+def test_list_imports_returns_relative_paths():
+
+    result = list_imports()
+
+    for item in result:
+
+        assert not Path(item["file"]).is_absolute()
+
+
+def test_list_imports_from_import():
+
+    result = list_imports()
+
+    pathlib_import = next(
+        item
+        for item in result
+        if item["module"] == "pathlib"
+    )
+
+    assert "Path" in pathlib_import["imports"]

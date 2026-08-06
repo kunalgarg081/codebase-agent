@@ -16,7 +16,7 @@ Status: 🟢 Active Certification
 
 | Test | Result |
 |------|--------|
-| pytest | ✅ PASS (15/15) |
+| pytest | ✅ PASS (18/18) |
 
 ---
 
@@ -48,6 +48,7 @@ Status: 🟢 Active Certification
 | list_classes() | ✅ PASS | Correctly discovers Python classes using AST. |
 | Relative Paths | ✅ PASS | Returns workspace-relative file paths. |
 | File Mapping | ✅ PASS | Correctly associates each class with its source file. |
+| list_imports() | ✅ PASS | Detects both `import` and `from ... import ...` statements. |
 
 ---
 

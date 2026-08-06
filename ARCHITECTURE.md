@@ -349,6 +349,7 @@ Current repository tools:
 - list_files()
 - list_python_functions()
 - list_classes()
+- list_imports()
 
 Design decisions:
 

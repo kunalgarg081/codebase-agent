@@ -39,7 +39,7 @@ Current Progress
 
 - ✅ list_files()
 - ✅ list_classes()
-- ⏳ list_imports()
+- ✅ list_imports()
 - ⏳ find_symbol()
 - ⏳ find_references()
 

@@ -31,6 +31,7 @@ All notable changes to this project will be documented here.
 - Added `/code` mode for multiline prompts.
 - Added `TEST_RESULTS.md` to record certification results.
 - Added `list_classes()` tool for discovering Python classes using the AST.
+- Added `list_imports()` tool for discovering Python imports using the AST.
 
 ### Changed
 
