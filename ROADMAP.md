@@ -1,99 +1,89 @@
 # Codebase Agent Roadmap
 
-## Current Version
-
-v2.1
+This document tracks the planned development of the project.
 
 ---
 
-## Completed Features
+# Current Version
 
-- OpenAI Compatible LLM
-- Native Tool Calling
-- Read File
-- Write File
-- List Directory
-- Search Text
-- Run Python
-- List Python Functions
-- Get Function Source
-- Project Context
-- Code Review
-- Conversation History
-- Write Confirmation
+v2.1.1
 
 ---
 
-## Current Architecture
+# Recently Completed
 
-```
-User
-    │
-    ▼
-CLI (main.py)
-    │
-    ▼
-Agent
-    │
-    ▼
-LLM
-    │
-    ▼
-Tool Executor
-    │
-    ▼
-Workspace
-```
+- ✅ Native OpenAI Tool Calling
+- ✅ Workspace sandbox
+- ✅ Read file
+- ✅ Write file (with confirmation)
+- ✅ Search text
+- ✅ List directory
+- ✅ Run Python files
+- ✅ List Python functions (AST)
+- ✅ Get function source (AST)
+- ✅ Conversation state
+- ✅ Project context
+- ✅ Automated unit tests
+- ✅ Testing documentation
+- ✅ Certification process
+- ✅ CLI `/code` mode for multiline prompts
 
 ---
 
-## Sprint 1 (Current)
+# In Progress
 
-Repository Intelligence
-
-Planned Features
-
-- [ ] List Files
-- [ ] List Classes
-- [ ] List Imports
-- [ ] Find Symbol
-- [ ] Find References
+- 🟡 v2.1 Certification
+    - Automated tests
+    - Manual tool testing
+    - Integration testing
+    - Release validation
 
 ---
 
-## Sprint 2
+# Next Release (v2.2)
 
-Editing Improvements
+## Repository Intelligence
 
-- [ ] Backup File
-- [ ] Preview Diff
-- [ ] Apply Patch
-
----
-
-## Sprint 3
-
-Execution
-
-- [ ] Run Pytest
-- [ ] Run Shell Command
-- [ ] Format Code
+- [ ] list_files()
+- [ ] list_classes()
+- [ ] list_imports()
+- [ ] find_symbol()
+- [ ] find_references()
 
 ---
 
-## Sprint 4
+## Improvements
 
-Memory
-
-- [ ] Conversation Memory
-- [ ] Project Memory
+- [ ] Improve `search_text()` to return matching lines.
+- [ ] Add configurable logging levels.
+- [ ] Improve error formatting.
+- [ ] Add more integration tests.
 
 ---
 
-## Sprint 5
+# Future
 
-Planning
+## Repository Understanding
 
-- [ ] Planning Agent
-- [ ] Multi-step Reasoning
-- [ ] Better Context Selection
+- Dependency graph
+- Symbol navigation
+- Project indexing
+
+## Agent Improvements
+
+- Planning agent
+- Better memory
+- Multi-step execution improvements
+
+## Git Integration
+
+- Git status
+- Git diff
+- Commit generation
+
+## Developer Experience
+
+- Auto-completion
+- Command history
+- Syntax highlighting
+- Configuration system

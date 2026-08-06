@@ -1,229 +1,139 @@
 # Codebase Agent Testing Guide
 
-This document defines the testing procedure before every release.
+This document describes how every release should be tested before it is considered stable.
 
 ---
 
-# Version
+# Testing Levels
 
-Current Version: v2.1
-
----
-
-# 1. Automated Tests
+## Level 1 – Unit Tests
 
 Run:
 
 ```bash
-pytest
+pytest -v
 ```
 
-Expected Result:
-
-- All tests should pass.
-
-Status:
-
-- [ ] Passed
-
----
-
-# 2. File Operations
-
-## Read Existing File
-
-Prompt:
-
-Read the file `hello.py`.
-
 Expected:
 
-- File contents are returned.
-
-Status:
-
-- [ ] Passed
+- All tests pass.
 
 ---
 
-## Read Missing File
+## Level 2 – Integration Tests
 
-Prompt:
+Verify that the Agent, LLM, Tool Executor, and tools work together correctly.
 
-Read `missing.py`.
+Examples:
 
-Expected:
-
-- Friendly error message.
-
-Status:
-
-- [ ] Passed
+- Read file
+- Write file
+- Run Python
+- Search
+- AST tools
 
 ---
 
-## Write File
+## Level 3 – User Scenarios
 
-Prompt:
+Test realistic workflows.
 
-Create a file named `demo.py` with:
+Examples:
 
-print("Hello")
-
-Expected:
-
-- Confirmation is shown.
-- File is created.
-
-Status:
-
-- [ ] Passed
+- Explain a file.
+- Review code.
+- Create a new file.
+- Modify existing code.
+- Execute Python.
+- Search the project.
 
 ---
 
-## Write Outside Workspace
+# Certification Checklist
 
-Attempt to write outside the workspace.
+## File Operations
 
-Expected:
-
-- Operation denied.
-
-Status:
-
-- [ ] Passed
+- [ ] Read existing file
+- [ ] Read missing file
+- [ ] Write file
+- [ ] Prevent writing outside workspace
 
 ---
 
-# 3. Directory Operations
+## Directory Operations
 
-Prompt:
-
-List the project directory.
-
-Expected:
-
-- Files are listed correctly.
-
-Status:
-
-- [ ] Passed
+- [ ] List workspace
 
 ---
 
-# 4. Search
+## Search
 
-Search for text that exists.
-
-Status:
-
-- [ ] Passed
-
-Search for text that does not exist.
-
-Status:
-
-- [ ] Passed
+- [ ] Search existing text
+- [ ] Search missing text
 
 ---
 
-# 5. Python AST
+## Python Execution
 
-List Python functions.
-
-Status:
-
-- [ ] Passed
+- [ ] Execute valid Python file
+- [ ] Execute file with runtime error
 
 ---
 
-Get function source.
+## AST
 
-Status:
-
-- [ ] Passed
-
----
-
-# 6. Python Execution
-
-Run a valid Python file.
-
-Status:
-
-- [ ] Passed
+- [ ] List Python functions
+- [ ] Get function source
 
 ---
 
-Run a Python file with an error.
+## Agent
 
-Status:
-
-- [ ] Passed
-
----
-
-# 7. Project Context
-
-Ask:
-
-Describe this project.
-
-Expected:
-
-- Agent uses project context correctly.
-
-Status:
-
-- [ ] Passed
+- [ ] Project context
+- [ ] Code review
+- [ ] Multi-step reasoning
+- [ ] Conversation memory
 
 ---
 
-# 8. Code Review
+# CLI Testing
 
-Ask for a code review of a workspace file.
+## Normal Mode
 
-Status:
+Verify:
 
-- [ ] Passed
+- Single-line commands are executed immediately.
 
----
+Examples:
 
-# 9. Multi-Step Reasoning
-
-Ask a question that requires multiple tool calls.
-
-Expected:
-
-- Agent completes all required steps.
-
-Status:
-
-- [ ] Passed
+- Read hello.py
+- Run greet.py
+- Explain calculator.py
 
 ---
 
-# 10. Conversation
+## Code Mode
 
-Ask a follow-up question.
+Enter:
 
-Expected:
+```
+/code
+```
 
-- Previous conversation is remembered.
+Verify:
 
-Status:
-
-- [ ] Passed
+- Multiline prompt is accepted.
+- Code formatting is preserved.
+- `END` sends the prompt.
+- CLI returns to normal mode after execution.
 
 ---
 
 # Release Decision
 
-Ready to Release
+A version is ready for release when:
 
-- [ ] Yes
-- [ ] No
-
-Notes
-
-__________________________
+- Unit tests pass.
+- Manual certification passes.
+- No critical bugs remain.
+- Documentation is updated.

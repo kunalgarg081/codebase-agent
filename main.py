@@ -20,27 +20,42 @@ def show_banner():
             "• Review calculator.py\n"
             "• Run main.py\n"
             "• Create hello.py\n"
+            "• /code (multiline mode)\n"
             "• Exit",
             border_style="cyan",
         )
     )
 
 
-def get_multiline_input() -> str:
+def get_single_line_input() -> str:
+    """
+    Read a normal one-line command.
+    """
+
+    console.print()
+    console.print("[bold green]🤖 You[/bold green]")
+
+    return input().strip()
+
+
+def get_code_input() -> str:
     """
     Read multiline input until the user types END.
     """
 
     console.print()
     console.print(
-        "[bold green]🤖 You[/bold green] "
-        "[dim](Finish with END on a new line)[/dim]"
+        Panel.fit(
+            "[bold cyan]📝 Code Mode[/bold cyan]\n\n"
+            "Paste your prompt below.\n"
+            "Type [bold]END[/bold] on a new line to send.",
+            border_style="cyan",
+        )
     )
 
     lines = []
 
     while True:
-
         line = input()
 
         if line.strip() == "END":
@@ -49,8 +64,6 @@ def get_multiline_input() -> str:
         lines.append(line)
 
     return "\n".join(lines).strip()
-
-
 def main():
 
     show_banner()
@@ -59,7 +72,10 @@ def main():
 
         while True:
 
-            user = get_multiline_input()
+            user = get_single_line_input()
+
+            if user.lower() == "/code":
+                user = get_code_input()
 
             if not user:
                 continue
@@ -71,7 +87,9 @@ def main():
 
                 break
 
-            response = agent.chat(user)
+            response = agent.chat(
+                user_message=user
+            )
 
             console.print()
 

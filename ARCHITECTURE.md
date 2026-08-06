@@ -67,6 +67,50 @@ The tools interact with the project files.
 
 ---
 
+---
+
+# Command Line Interface (CLI)
+
+The application provides two input modes.
+
+## Normal Mode
+
+Used for everyday interactions.
+
+Examples:
+
+- Read hello.py
+- Run greet.py
+- Explain calculator.py
+
+Press **Enter** to send the command.
+
+---
+
+## Code Mode
+
+Enter:
+
+```
+/code
+```
+
+The CLI switches to multiline mode.
+
+The user can paste long prompts or source code.
+
+Typing:
+
+```
+END
+```
+
+on a new line submits the entire prompt and returns the CLI to normal mode.
+
+This approach keeps normal interactions fast while providing a reliable way to submit multiline code without terminal input limitations.
+
+---
+
 # Folder Responsibilities
 
 ## app/
