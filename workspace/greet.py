@@ -1,5 +1,3 @@
-DATABASE_URL: str = "sqlite.db"
-
 def greet(name: str) -> str:
     return f"Hello {name}"
 

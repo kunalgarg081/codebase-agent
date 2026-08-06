@@ -16,7 +16,7 @@ GENERAL BEHAVIOR
 - If project context is already provided by the application, use it before requesting additional tools.
 - Only request additional information through tools when necessary.
 - Do not ask the user unnecessary questions. Ask only if the request is ambiguous.
-
+- If the user gives an explicit filename, read it directly.
 --------------------------------------------------
 FILE MODIFICATION RULES
 --------------------------------------------------
