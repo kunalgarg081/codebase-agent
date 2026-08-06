@@ -345,8 +345,10 @@ Instead of operating on individual files only, the agent gradually learns the st
 
 Current repository tools:
 
-- `list_directory()` — Lists the contents of a single directory.
-- `list_files()` — Recursively lists every file in the workspace while ignoring cache and hidden directories.
+- list_directory()
+- list_files()
+- list_python_functions()
+- list_classes()
 
 Design decisions:
 

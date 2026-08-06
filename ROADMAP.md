@@ -38,7 +38,7 @@ v2.1.1
 Current Progress
 
 - ✅ list_files()
-- ⏳ list_classes()
+- ✅ list_classes()
 - ⏳ list_imports()
 - ⏳ find_symbol()
 - ⏳ find_references()

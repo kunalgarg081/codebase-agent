@@ -16,7 +16,7 @@ Status: 🟢 Active Certification
 
 | Test | Result |
 |------|--------|
-| pytest | ✅ PASS (12/12) |
+| pytest | ✅ PASS (15/15) |
 
 ---
 
@@ -45,6 +45,9 @@ Status: 🟢 Active Certification
 | list_files() | ✅ PASS | Recursive listing works correctly. |
 | Relative Paths | ✅ PASS | Returns workspace-relative paths only. |
 | Hidden Directory Filtering | ✅ PASS | Ignores `.git`, `__pycache__`, `.pytest_cache`, and `.vscode`. |
+| list_classes() | ✅ PASS | Correctly discovers Python classes using AST. |
+| Relative Paths | ✅ PASS | Returns workspace-relative file paths. |
+| File Mapping | ✅ PASS | Correctly associates each class with its source file. |
 
 ---
 

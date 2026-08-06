@@ -10,6 +10,7 @@ from app.tools import (
     get_function_source,
     run_python,
     workspace,
+    list_classes,
 )
 
 
@@ -107,3 +108,36 @@ def test_list_files_ignores_hidden_directories():
     assert ".git/secret.py" not in result
 
     secret.unlink()
+
+
+def test_list_classes():
+
+    result = list_classes()
+
+    class_names = [
+        item["class"]
+        for item in result
+    ]
+
+    assert "Calculator" in class_names
+    assert "User" in class_names
+
+def test_list_classes_returns_file():
+
+    result = list_classes()
+
+    files = {
+        item["file"]
+        for item in result
+    }
+
+    assert "classes_demo.py" in files
+
+
+def test_list_classes_relative_paths():
+
+    result = list_classes()
+
+    for item in result:
+
+        assert not Path(item["file"]).is_absolute()

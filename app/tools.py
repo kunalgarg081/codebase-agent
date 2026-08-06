@@ -266,6 +266,43 @@ def list_python_functions() -> str:
     return "\n\n".join(results)
 
 
+def list_classes() -> list[dict]:
+    """
+    List all Python classes in the workspace.
+    """
+
+    results = []
+
+    for file in iter_python_files():
+
+        try:
+
+            source = file.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            )
+
+            tree = ast.parse(source)
+
+            for node in ast.walk(tree):
+
+                if isinstance(node, ast.ClassDef):
+
+                    results.append(
+                        {
+                            "file": str(file.relative_to(workspace)),
+                            "class": node.name,
+                        }
+                    )
+
+        except Exception:
+            continue
+
+    return sorted(
+        results,
+        key=lambda item: (item["file"], item["class"])
+    )
+
 def get_function_source(function_name: str) -> str:
     """
     Return the complete source code of a function.
@@ -491,6 +528,14 @@ TOOLS = {
     "list_files": {
         "function": list_files,
         "description": "Recursively list all files in the workspace.",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+    "list_classes": {
+        "function": list_classes,
+        "description": "List all Python classes in the workspace.",
         "parameters": {
             "type": "object",
             "properties": {}
