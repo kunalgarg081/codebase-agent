@@ -107,7 +107,7 @@ Certification Status:
 
 | Result | Status |
 |---|---|
-| Pytest | ✅ 25/25 passed |
+| Pytest | ✅ 28/28 passed |
 
 ## Repository Intelligence
 
@@ -115,6 +115,7 @@ Certification Status:
 |---|---|---|
 | `find_symbol_references()` | ✅ PASS | AST-based definitions, calls, and imports |
 | `find_module_dependencies()` | ✅ PASS | Identifies project-local Python dependencies |
+| `find_module_dependents()` | ✅ PASS | Identifies project files that depend on a Python module |
 
 ## Manual Tests
 
@@ -125,6 +126,8 @@ Certification Status:
 | Where is divide used? | ✅ PASS |
 | What does imports_demo.py depend on? | ✅ PASS |
 | Which project files does imports_demo.py import? | ✅ PASS |
+| Who depends on greet.py? | ✅ PASS |
+| Which files import calculator.py? | ✅ PASS |
 
 ## Certification Status
 

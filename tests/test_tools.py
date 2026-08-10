@@ -14,6 +14,7 @@ from app.tools import (
     list_imports,
     find_symbol_references,
     find_module_dependencies,
+    find_module_dependents,
 )
 
 
@@ -244,5 +245,26 @@ def test_find_module_dependencies_no_dependencies():
 def test_find_module_dependencies_missing_file():
 
     result = find_module_dependencies("does_not_exist.py")
+
+    assert "does_not_exist.py" in result
+
+
+def test_find_module_dependents():
+
+    result = find_module_dependents("greet.py")
+
+    assert "imports_demo.py" in result
+
+
+def test_find_module_dependents_no_dependents():
+
+    result = find_module_dependents("calculator.py")
+
+    assert "No project dependents found" in result
+
+
+def test_find_module_dependents_missing_file():
+
+    result = find_module_dependents("does_not_exist.py")
 
     assert "does_not_exist.py" in result

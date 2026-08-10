@@ -14,6 +14,8 @@ All notable changes to this project will be documented here.
 - Added detection of imports.
 - Added `find_module_dependencies()` for project-local Python dependencies.
 - Standard-library imports are excluded from project dependency results.
+- Added `find_module_dependents()` to identify project files that depend on a Python module.
+- Added reverse dependency analysis for project-local Python modules.
 
 ### Testing
 

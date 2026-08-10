@@ -642,6 +642,79 @@ def find_module_dependencies(path: str):
     return "\n".join(sorted(dependencies))
 
 
+def find_module_dependents(path: str):
+    """
+    Find project Python files that import the given Python module.
+
+    Returns project files that depend on the specified module.
+    Standard-library and third-party modules are ignored.
+    """
+
+    file = resolve_workspace_path(path)
+
+    if file is None:
+        return "Access denied."
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if not file.is_file():
+        return f"'{path}' is not a file."
+
+    if file.suffix != ".py":
+        return "Only Python files can be analyzed."
+
+    target_module = file.stem
+
+    dependents = set()
+
+    for candidate in workspace.rglob("*.py"):
+
+        try:
+            source = candidate.read_text(
+                encoding="utf-8",
+                errors="ignore",
+            )
+
+            tree = ast.parse(source)
+
+        except (OSError, SyntaxError):
+            continue
+
+        for node in ast.walk(tree):
+
+            # import greet
+            # import greet as something
+            if isinstance(node, ast.Import):
+
+                for alias in node.names:
+
+                    module = alias.name.split(".")[0]
+
+                    if module == target_module:
+                        dependents.add(
+                            candidate.relative_to(workspace).as_posix()
+                        )
+
+            # from greet import greet
+            elif isinstance(node, ast.ImportFrom):
+
+                if not node.module:
+                    continue
+
+                module = node.module.split(".")[0]
+
+                if module == target_module:
+                    dependents.add(
+                        candidate.relative_to(workspace).as_posix()
+                    )
+
+    if not dependents:
+        return f"No project dependents found for '{path}'."
+
+    return "\n".join(sorted(dependents))
+
+
 TOOLS = {
     "read_file": {
         "function": read_file,
@@ -823,6 +896,26 @@ TOOLS = {
                     "description": (
                         "Relative path to the Python file "
                         "to analyze."
+                    )
+                }
+            },
+            "required": ["path"]
+        }
+    },
+    "find_module_dependents": {
+        "function": find_module_dependents,
+        "description": (
+            "Find project Python files that import or depend "
+            "on a given Python module."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": (
+                        "Relative path to the Python module "
+                        "to find dependents for."
                     )
                 }
             },

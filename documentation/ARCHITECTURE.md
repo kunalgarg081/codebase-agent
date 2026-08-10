@@ -187,6 +187,7 @@ Current AST Features:
 - List Imports
 - Find Symbol References
 - Find Module Dependencies
+- Find Module Dependents
 
 ## Symbol Reference Analysis
 
