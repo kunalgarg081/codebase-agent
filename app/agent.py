@@ -1,3 +1,4 @@
+from email.mime import message
 import json
 from typing import Any
 from rich.console import Console
@@ -34,21 +35,44 @@ class Agent:
 
     def _trim_history(self):
         """
-        Keep the system prompt and only
-        the most recent conversation.
+        Keep the system prompt and the most recent
+        complete conversation turns.
+    
+        Supports both plain dictionaries and SDK
+        ChatCompletionMessage objects.
         """
-
+    
         if len(self.messages) <= MAX_HISTORY:
             return
-
+    
         system = self.messages[0]
-
-        recent = self.messages[-MAX_HISTORY:]
-
-        self.messages = [
-            system,
-            *recent,
-        ]
+        history = self.messages[1:]
+    
+        def get_role(message):
+            if isinstance(message, dict):
+                return message.get("role")
+    
+            return getattr(message, "role", None)
+    
+        while len([system] + history) > MAX_HISTORY:
+        
+            # Find the oldest user message.
+            while history and get_role(history[0]) != "user":
+                history.pop(0)
+    
+            if not history:
+                break
+            
+            # Remove the oldest user message.
+            history.pop(0)
+    
+            # Remove everything belonging to that turn:
+            # assistant/tool/assistant responses until
+            # the next user message.
+            while history and get_role(history[0]) != "user":
+                history.pop(0)
+    
+        self.messages = [system] + history
 
     def _confirm_write(self, path: str) -> bool:
         """
@@ -96,15 +120,57 @@ class Agent:
             "role": "user",
             "content": content,
         }
+
     def _call_llm(self) -> Any:
+        """
+        Send the current conversation to the LLM.
+        """
+
+        if DEBUG:
+
+            total_chars = 0
+
+            for msg in self.messages:
+
+                if isinstance(msg, dict):
+
+                    total_chars += len(
+                        str(msg.get("content", ""))
+                    )
+
+                else:
+
+                    total_chars += len(
+                        str(getattr(msg, "content", ""))
+                    )
+
+            print("\n========== REQUEST DEBUG ==========")
+            print(f"Messages   : {len(self.messages)}")
+            print(f"Characters : {total_chars}")
+
+            print("\nRoles:")
+
+            for i, msg in enumerate(self.messages, start=1):
+
+                if isinstance(msg, dict):
+                    role = msg.get("role", "unknown")
+                else:
+                    role = getattr(msg, "role", "unknown")
+
+                print(f"{i:02d}. {role}")
+
+            print("===================================\n")
 
         try:
+
             return ask_llm(self.messages)
 
         except RuntimeError as e:
-            self.state.last_error = str(e)
-            return str(e)
 
+            self.state.last_error = str(e)
+
+            return str(e)
+    
     def _parse_arguments(self, tool_call) -> dict | None:
         """
         Parse tool arguments safely.
@@ -191,6 +257,7 @@ class Agent:
         )
 
         return None
+
 
     def chat(self, user_message: str) -> str:
         """

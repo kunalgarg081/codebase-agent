@@ -17,7 +17,7 @@ from app.tools import (
 
 def test_read_existing_file():
     result = read_file("hello.py")
-    assert "Hello World" in result
+    assert "Hello Python" in result
 
 
 def test_read_missing_file():
@@ -52,7 +52,7 @@ def test_list_directory():
 
 def test_search_text():
 
-    result = search_text("Hello World")
+    result = search_text("Hello Python")
 
     assert "hello.py" in result
 
@@ -77,7 +77,7 @@ def test_run_python():
 
     assert "Exit Code: 0" in result
 
-    assert "Hello World" in result
+    assert "Hello Python" in result
 
 
 def test_list_files():

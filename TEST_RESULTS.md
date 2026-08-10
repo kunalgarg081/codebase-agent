@@ -35,7 +35,23 @@ Status: 🟢 Active Certification
 | Get Function Source | ✅ PASS | Returned exact function source. |
 
 ---
+## 2026-08-07
 
+### Investigation: Random 401 Unauthorized
+
+Symptoms:
+- All requests failed immediately with HTTP 401.
+- Failure occurred on the first prompt.
+
+Root Cause:
+- Selected model (`north-mini-code-free`) was no longer usable with the provider.
+
+Resolution:
+- Switched to another supported model.
+- No code changes were required.
+
+Status:
+- Resolved.
 ---
 
 # v2.2 Feature Certification

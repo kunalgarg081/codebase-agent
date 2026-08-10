@@ -4,4 +4,7 @@ def greet(name: str) -> str:
 def hello() -> str:
     return "Hi"
 
+def goodbye() -> str:
+    return "Goodbye"
+
 print(greet("Kunal"))
