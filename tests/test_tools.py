@@ -13,6 +13,7 @@ from app.tools import (
     list_classes,
     list_imports,
     find_symbol_references,
+    find_module_dependencies,
 )
 
 
@@ -224,3 +225,24 @@ def test_list_imports_from_import():
     )
 
     assert "Path" in pathlib_import["imports"]
+
+
+def test_find_module_dependencies():
+
+    result = find_module_dependencies("imports_demo.py")
+
+    assert "greet.py" in result
+
+
+def test_find_module_dependencies_no_dependencies():
+
+    result = find_module_dependencies("hello.py")
+
+    assert "No project dependencies found" in result
+
+
+def test_find_module_dependencies_missing_file():
+
+    result = find_module_dependencies("does_not_exist.py")
+
+    assert "does_not_exist.py" in result

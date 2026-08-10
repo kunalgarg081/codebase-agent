@@ -569,6 +569,79 @@ def find_symbol_references(symbol: str):
 
     return results
 
+
+def find_module_dependencies(path: str):
+    """
+    Find project Python modules imported by a Python file.
+
+    Returns project-local dependencies only.
+    Standard-library and third-party imports are ignored.
+    """
+
+    file = resolve_workspace_path(path)
+
+    if file is None:
+        return "Access denied."
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if not file.is_file():
+        return f"'{path}' is not a file."
+
+    if file.suffix != ".py":
+        return "Only Python files can be analyzed."
+
+    try:
+        source = file.read_text(
+            encoding="utf-8",
+            errors="ignore",
+        )
+
+        tree = ast.parse(source)
+
+    except SyntaxError as e:
+        return f"Could not parse '{path}': {e}"
+
+    dependencies = set()
+
+    for node in ast.walk(tree):
+
+        # import greet
+        if isinstance(node, ast.Import):
+
+            for alias in node.names:
+
+                module = alias.name.split(".")[0]
+
+                candidate = workspace / f"{module}.py"
+
+                if candidate.exists():
+                    dependencies.add(
+                        candidate.relative_to(workspace).as_posix()
+                    )
+
+        # from greet import greet
+        elif isinstance(node, ast.ImportFrom):
+
+            if not node.module:
+                continue
+
+            module = node.module.split(".")[0]
+
+            candidate = workspace / f"{module}.py"
+
+            if candidate.exists():
+                dependencies.add(
+                    candidate.relative_to(workspace).as_posix()
+                )
+
+    if not dependencies:
+        return f"No project dependencies found for '{path}'."
+
+    return "\n".join(sorted(dependencies))
+
+
 TOOLS = {
     "read_file": {
         "function": read_file,
@@ -735,6 +808,25 @@ TOOLS = {
                 }
             },
             "required": ["symbol"]
+        }
+    },
+    "find_module_dependencies": {
+        "function": find_module_dependencies,
+        "description": (
+            "Find project Python modules imported by a Python file."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": (
+                        "Relative path to the Python file "
+                        "to analyze."
+                    )
+                }
+            },
+            "required": ["path"]
         }
     },
 }
