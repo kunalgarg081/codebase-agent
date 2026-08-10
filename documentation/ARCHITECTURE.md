@@ -183,13 +183,35 @@ Current AST Features:
 
 - List Python Functions
 - Get Function Source
-
-Future AST Features:
-
 - List Classes
 - List Imports
-- Find Symbols
-- Dependency Analysis
+- Find Symbol References
+- Find Module Dependencies
+
+## Symbol Reference Analysis
+
+The `find_symbol_references()` tool uses Python's AST to locate:
+
+- Symbol definitions
+- Function and class calls
+- Imports
+- Project-local references
+
+For example, it can distinguish a real function call from ordinary text containing the same word.
+
+## Module Dependency Analysis
+
+The `find_module_dependencies()` tool analyzes Python imports and identifies project-local Python modules used by a file.
+
+Standard-library imports such as `math`, `os`, and `pathlib` are not reported as project dependencies.
+
+Example:
+
+```text
+imports_demo.py
+    ↓
+greet.py
+```
 
 ---
 

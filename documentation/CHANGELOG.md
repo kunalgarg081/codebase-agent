@@ -4,6 +4,33 @@ All notable changes to this project will be documented here.
 
 ---
 
+## v0.5.0 - Repository Intelligence
+
+### Added
+
+- Added `find_symbol_references()` using Python AST.
+- Added detection of symbol definitions.
+- Added detection of function and class calls.
+- Added detection of imports.
+- Added `find_module_dependencies()` for project-local Python dependencies.
+- Standard-library imports are excluded from project dependency results.
+
+### Testing
+
+- Automated test suite expanded from 22 to 25 tests.
+- All 25 tests pass.
+- Manually verified symbol reference queries for:
+  - `greet`
+  - `Calculator`
+  - `divide`
+- Manually verified module dependency analysis for `imports_demo.py`.
+
+### Integration
+
+- Added both tools to the agent tool registry.
+- Verified that the LLM selects the new tools correctly.
+
+
 ## v2.1
 
 ### Added

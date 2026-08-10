@@ -6,7 +6,7 @@ This document tracks the planned development of the project.
 
 # Current Version
 
-v2.1.1
+v0.5.0
 
 ---
 
@@ -28,32 +28,48 @@ v2.1.1
 - ✅ Certification process
 - ✅ CLI `/code` mode for multiline prompts
 - ✅ Recursive file listing (`list_files()`)
+- ✅ AST symbol reference analysis (`find_symbol_references()`)
+- ✅ Project module dependency analysis (`find_module_dependencies()`)
 
 ---
 
 # In Progress
 
-- 🟡 v2.2 - Repository Intelligence
+Repository Intelligence has reached its first completed milestone.
 
-Current Progress
+Completed:
 
 - ✅ list_files()
 - ✅ list_classes()
 - ✅ list_imports()
-- ⏳ find_symbol()
-- ⏳ find_references()
+- ✅ find_symbol_references()
+- ✅ find_module_dependencies()
+
+Next focus:
+
+- ⏳ Dependency graph
+- ⏳ Symbol navigation
+- ⏳ Repository indexing
 
 ---
 
-# Next Release (v2.2)
+# Next Release
 
 ## Repository Intelligence
 
-- [ ] list_files()
-- [ ] list_classes()
-- [ ] list_imports()
-- [ ] find_symbol()
-- [ ] find_references()
+Completed:
+
+- [x] list_files()
+- [x] list_classes()
+- [x] list_imports()
+- [x] find_symbol_references()
+- [x] find_module_dependencies()
+
+Future improvements:
+
+- [ ] Dependency graph
+- [ ] Symbol navigation
+- [ ] Repository indexing
 
 ---
 

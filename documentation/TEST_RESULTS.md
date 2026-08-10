@@ -4,9 +4,9 @@
 
 # Version
 
-v2.1
+v0.5.0
 
-Certification Date: 2026-08-06
+Certification Date: 2026-08-10
 
 Status: 🟢 Active Certification
 
@@ -16,7 +16,7 @@ Status: 🟢 Active Certification
 
 | Test | Result |
 |------|--------|
-| pytest | ✅ PASS (18/18) |
+| pytest | ✅ PASS (25/25) |
 
 ---
 
@@ -98,3 +98,34 @@ Current Result:
 Certification Status:
 
 🟡 In Progress
+
+---
+
+# v0.5.0 Certification
+
+## Automated Tests
+
+| Result | Status |
+|---|---|
+| Pytest | ✅ 25/25 passed |
+
+## Repository Intelligence
+
+| Feature | Result | Notes |
+|---|---|---|
+| `find_symbol_references()` | ✅ PASS | AST-based definitions, calls, and imports |
+| `find_module_dependencies()` | ✅ PASS | Identifies project-local Python dependencies |
+
+## Manual Tests
+
+| Query | Result |
+|---|---|
+| Where is greet used? | ✅ PASS |
+| Where is Calculator used? | ✅ PASS |
+| Where is divide used? | ✅ PASS |
+| What does imports_demo.py depend on? | ✅ PASS |
+| Which project files does imports_demo.py import? | ✅ PASS |
+
+## Certification Status
+
+🟢 v0.5.0 repository intelligence milestone verified.
