@@ -12,6 +12,7 @@ from app.tools import (
     workspace,
     list_classes,
     list_imports,
+    find_symbol_references,
 )
 
 
@@ -57,6 +58,50 @@ def test_search_text():
     assert "hello.py" in result
 
 
+def test_find_symbol_references_function():
+
+    result = find_symbol_references("greet")
+
+    assert any(
+        item["file"] == "greet.py"
+        and item["kind"] == "definition"
+        for item in result
+    )
+
+    assert any(
+        item["file"] == "greet.py"
+        and item["kind"] == "call"
+        for item in result
+    )
+
+
+def test_find_symbol_references_import():
+
+    result = find_symbol_references("greet")
+
+    assert any(
+        item["file"] == "imports_demo.py"
+        and item["kind"] == "import"
+        for item in result
+    )
+
+
+def test_find_symbol_references_class():
+
+    result = find_symbol_references("Calculator")
+
+    assert any(
+        item["file"] == "classes_demo.py"
+        and item["kind"] == "definition"
+        for item in result
+    )
+
+
+def test_find_symbol_references_no_match():
+
+    result = find_symbol_references("DefinitelyNotARealSymbol")
+
+    assert result == []
 def test_list_python_functions():
 
     result = list_python_functions()

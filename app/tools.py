@@ -455,6 +455,120 @@ def review_file(path: str) -> str:
     return read_file(path)
 
 
+def find_symbol_references(symbol: str):
+    """
+    Find AST-level definitions, calls, imports, and references
+    to a symbol across Python files in the workspace.
+    """
+
+    results = []
+
+    workspace = Path(WORKSPACE)
+
+    for path in workspace.rglob("*.py"):
+
+        # Ignore hidden directories
+        relative_path = path.relative_to(workspace)
+
+        if any(
+            part.startswith(".")
+            for part in relative_path.parts
+        ):
+            continue
+
+        try:
+            source = path.read_text(
+                encoding="utf-8",
+                errors="replace",
+            )
+
+            tree = ast.parse(source)
+
+        except (OSError, SyntaxError):
+            continue
+
+        relative_file = relative_path.as_posix()
+
+        for node in ast.walk(tree):
+
+            # Function definition
+            if isinstance(
+                node,
+                (ast.FunctionDef, ast.AsyncFunctionDef),
+            ):
+                if node.name == symbol:
+                    results.append({
+                        "file": relative_file,
+                        "line": node.lineno,
+                        "kind": "definition",
+                    })
+
+            # Class definition
+            elif isinstance(node, ast.ClassDef):
+                if node.name == symbol:
+                    results.append({
+                        "file": relative_file,
+                        "line": node.lineno,
+                        "kind": "definition",
+                    })
+
+            # Function/class call
+            elif isinstance(node, ast.Call):
+
+                if isinstance(node.func, ast.Name):
+
+                    if node.func.id == symbol:
+                        results.append({
+                            "file": relative_file,
+                            "line": node.lineno,
+                            "kind": "call",
+                        })
+
+                elif isinstance(node.func, ast.Attribute):
+
+                    if node.func.attr == symbol:
+                        results.append({
+                            "file": relative_file,
+                            "line": node.lineno,
+                            "kind": "call",
+                        })
+
+            # import foo
+            elif isinstance(node, ast.Import):
+
+                for alias in node.names:
+
+                    imported_name = (
+                        alias.asname
+                        or alias.name.split(".")[0]
+                    )
+
+                    if imported_name == symbol:
+                        results.append({
+                            "file": relative_file,
+                            "line": node.lineno,
+                            "kind": "import",
+                        })
+
+            # from module import symbol
+            elif isinstance(node, ast.ImportFrom):
+
+                for alias in node.names:
+
+                    imported_name = (
+                        alias.asname
+                        or alias.name
+                    )
+
+                    if imported_name == symbol:
+                        results.append({
+                            "file": relative_file,
+                            "line": node.lineno,
+                            "kind": "import",
+                        })
+
+    return results
+
 TOOLS = {
     "read_file": {
         "function": read_file,
@@ -604,6 +718,23 @@ TOOLS = {
         "parameters": {
             "type": "object",
             "properties": {}
+        }
+    },
+    "find_symbol_references": {
+        "function": find_symbol_references,
+        "description": (
+            "Find where a Python symbol is defined, called, "
+            "or imported across the workspace."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": "Name of the Python symbol to find."
+                }
+            },
+            "required": ["symbol"]
         }
     },
 }
