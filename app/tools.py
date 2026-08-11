@@ -266,6 +266,190 @@ def list_python_functions() -> str:
     return "\n\n".join(results)
 
 
+def analyze_project() -> str:
+    """
+    Generate a high-level overview of the Python project.
+
+    Includes:
+    - Python files
+    - Classes
+    - Functions
+    - Project dependencies
+    - Project dependents
+    """
+
+    sections = []
+
+    # ---------------------------------------------------------
+    # Files
+    # ---------------------------------------------------------
+
+    files = []
+
+    for file in iter_python_files():
+        try:
+            files.append(
+                str(file.relative_to(workspace))
+            )
+        except ValueError:
+            continue
+
+    files = sorted(files)
+
+    if files:
+        sections.append(
+            "Files\n"
+            "-----\n"
+            + "\n".join(
+                f"- {file}"
+                for file in files
+            )
+        )
+    else:
+        sections.append(
+            "Files\n"
+            "-----\n"
+            "No Python files found."
+        )
+
+    # ---------------------------------------------------------
+    # Classes
+    # ---------------------------------------------------------
+
+    classes = list_classes()
+
+    if classes:
+
+        class_lines = []
+
+        for item in classes:
+            class_lines.append(
+                f"- {item['file']}: {item['class']}"
+            )
+
+        sections.append(
+            "Classes\n"
+            "-------\n"
+            + "\n".join(class_lines)
+        )
+
+    else:
+        sections.append(
+            "Classes\n"
+            "-------\n"
+            "No Python classes found."
+        )
+
+    # ---------------------------------------------------------
+    # Functions
+    # ---------------------------------------------------------
+
+    functions = list_python_functions()
+
+    sections.append(
+        "Functions\n"
+        "---------\n"
+        + functions
+    )
+
+    # ---------------------------------------------------------
+    # Dependencies
+    # ---------------------------------------------------------
+
+    dependency_lines = []
+
+    for file in files:
+
+        result = find_module_dependencies(file)
+
+        if result.startswith(
+            "No project dependencies found"
+        ):
+            continue
+
+        if result.startswith(
+            "Access denied."
+        ):
+            continue
+
+        if result.startswith(
+            "File "
+        ):
+            continue
+
+        if result.startswith(
+            "Could not parse"
+        ):
+            continue
+
+        for dependency in result.splitlines():
+
+            dependency_lines.append(
+                f"- {file} -> {dependency}"
+            )
+
+    sections.append(
+        "Project Dependencies\n"
+        "--------------------\n"
+        + (
+            "\n".join(dependency_lines)
+            if dependency_lines
+            else "No project dependencies found."
+        )
+    )
+
+    # ---------------------------------------------------------
+    # Dependents
+    # ---------------------------------------------------------
+
+    dependent_lines = []
+
+    for file in files:
+
+        result = find_module_dependents(file)
+
+        if result.startswith(
+            "No project dependents found"
+        ):
+            continue
+
+        if result.startswith(
+            "Access denied."
+        ):
+            continue
+
+        if result.startswith(
+            "File "
+        ):
+            continue
+
+        if result.startswith(
+            "Could not parse"
+        ):
+            continue
+
+        for dependent in result.splitlines():
+
+            dependent_lines.append(
+                f"- {file} <- {dependent}"
+            )
+
+    sections.append(
+        "Project Dependents\n"
+        "------------------\n"
+        + (
+            "\n".join(dependent_lines)
+            if dependent_lines
+            else "No project dependents found."
+        )
+    )
+
+    return (
+        "Project Overview\n"
+        "================\n\n"
+        + "\n\n".join(sections)
+    )
+
 def list_classes() -> list[dict]:
     """
     List all Python classes in the workspace.
@@ -921,6 +1105,19 @@ TOOLS = {
             },
             "required": ["path"]
         }
+    },
+    "analyze_project": {
+        "function": analyze_project,
+        "description": (
+            "Generate a high-level overview of the Python project "
+            "including files, classes, functions, dependencies, "
+            "and dependents."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
     },
 }
 

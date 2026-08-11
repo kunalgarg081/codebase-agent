@@ -107,7 +107,7 @@ Certification Status:
 
 | Result | Status |
 |---|---|
-| Pytest | ✅ 28/28 passed |
+| Pytest | ✅ 32/32 passed |
 
 ## Repository Intelligence
 
@@ -116,6 +116,7 @@ Certification Status:
 | `find_symbol_references()` | ✅ PASS | AST-based definitions, calls, and imports |
 | `find_module_dependencies()` | ✅ PASS | Identifies project-local Python dependencies |
 | `find_module_dependents()` | ✅ PASS | Identifies project files that depend on a Python module |
+| `analyze_project()` | ✅ PASS | Generates a high-level project overview |
 
 ## Manual Tests
 
@@ -128,6 +129,8 @@ Certification Status:
 | Which project files does imports_demo.py import? | ✅ PASS |
 | Who depends on greet.py? | ✅ PASS |
 | Which files import calculator.py? | ✅ PASS |
+| Give me an overview of this project. | ✅ PASS |
+| How are the project files connected? | ✅ PASS |
 
 ## Certification Status
 

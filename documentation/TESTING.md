@@ -16,7 +16,8 @@ pytest -v
 
 Expected:
 
-- All tests pass.
+* All tests pass.
+* Current test suite: **32 tests**.
 
 ---
 
@@ -26,11 +27,15 @@ Verify that the Agent, LLM, Tool Executor, and tools work together correctly.
 
 Examples:
 
-- Read file
-- Write file
-- Run Python
-- Search
-- AST tools
+* Read file
+* Write file
+* Run Python
+* Search
+* AST tools
+* Symbol reference analysis
+* Module dependency analysis
+* Module dependent analysis
+* Project analysis
 
 ---
 
@@ -40,12 +45,14 @@ Test realistic workflows.
 
 Examples:
 
-- Explain a file.
-- Review code.
-- Create a new file.
-- Modify existing code.
-- Execute Python.
-- Search the project.
+* Explain a file.
+* Review code.
+* Create a new file.
+* Modify existing code.
+* Execute Python.
+* Search the project.
+* Get a project overview.
+* Analyze project file connections.
 
 ---
 
@@ -53,47 +60,53 @@ Examples:
 
 ## File Operations
 
-- [ ] Read existing file
-- [ ] Read missing file
-- [ ] Write file
-- [ ] Prevent writing outside workspace
+* [ ] Read existing file
+* [ ] Read missing file
+* [ ] Write file
+* [ ] Prevent writing outside workspace
 
 ---
 
 ## Directory Operations
 
-- [x] List workspace
-- [x] List all files recursively
+* [x] List workspace
+* [x] List all files recursively
 
 ---
 
 ## Search
 
-- [ ] Search existing text
-- [ ] Search missing text
+* [ ] Search existing text
+* [ ] Search missing text
 
 ---
 
 ## Python Execution
 
-- [ ] Execute valid Python file
-- [ ] Execute file with runtime error
+* [ ] Execute valid Python file
+* [ ] Execute file with runtime error
 
 ---
 
 ## AST
 
-- [ ] List Python functions
-- [ ] Get function source
+* [ ] List Python functions
+* [ ] Get function source
+* [x] Find symbol references
+* [x] Find module dependencies
+* [x] Find module dependents
+* [x] Analyze project
 
 ---
 
 ## Agent
 
-- [ ] Project context
-- [ ] Code review
-- [ ] Multi-step reasoning
-- [ ] Conversation memory
+* [ ] Project context
+* [ ] Code review
+* [ ] Multi-step reasoning
+* [ ] Conversation memory
+* [x] Project overview
+* [x] Project file connections
 
 ---
 
@@ -103,13 +116,15 @@ Examples:
 
 Verify:
 
-- Single-line commands are executed immediately.
+* Single-line commands are executed immediately.
 
 Examples:
 
-- Read hello.py
-- Run greet.py
-- Explain calculator.py
+* Read hello.py
+* Run greet.py
+* Explain calculator.py
+* Get a project overview
+* Analyze project file connections
 
 ---
 
@@ -117,16 +132,16 @@ Examples:
 
 Enter:
 
-```
+```text
 /code
 ```
 
 Verify:
 
-- Multiline prompt is accepted.
-- Code formatting is preserved.
-- `END` sends the prompt.
-- CLI returns to normal mode after execution.
+* Multiline prompt is accepted.
+* Code formatting is preserved.
+* `END` sends the prompt.
+* CLI returns to normal mode after execution.
 
 ---
 
@@ -134,7 +149,7 @@ Verify:
 
 A version is ready for release when:
 
-- Unit tests pass.
-- Manual certification passes.
-- No critical bugs remain.
-- Documentation is updated.
+* Unit tests pass.
+* Manual certification passes.
+* No critical bugs remain.
+* Documentation is updated.
