@@ -16,6 +16,7 @@ from app.tools import (
     find_module_dependencies,
     find_module_dependents,
     analyze_project,
+    build_dependency_graph,
 )
 
 
@@ -301,3 +302,31 @@ def test_analyze_project_dependents():
     result = analyze_project()
 
     assert "greet.py <- imports_demo.py" in result
+
+
+def test_build_dependency_graph():
+
+    result = build_dependency_graph()
+
+    assert "Project Dependency Graph" in result
+    assert "imports_demo.py" in result
+    assert "-> greet.py" in result
+
+
+def test_build_dependency_graph_isolated_files():
+
+    result = build_dependency_graph()
+
+    assert "calculator.py" in result
+    assert "calculator.py\n    -> none" in result
+
+
+def test_build_dependency_graph_all_files():
+
+    result = build_dependency_graph()
+
+    assert "classes_demo.py" in result
+    assert "demo.py" in result
+    assert "greet.py" in result
+    assert "hello.py" in result
+    assert "pytest_test.py" in result

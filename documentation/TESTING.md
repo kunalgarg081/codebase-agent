@@ -96,6 +96,7 @@ Examples:
 * [x] Find module dependencies
 * [x] Find module dependents
 * [x] Analyze project
+* [x] Build dependency graph
 
 ---
 

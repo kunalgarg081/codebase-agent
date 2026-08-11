@@ -450,6 +450,79 @@ def analyze_project() -> str:
         + "\n\n".join(sections)
     )
 
+
+def build_dependency_graph() -> str:
+    """
+    Build a project-level dependency graph for Python modules.
+
+    Returns a readable list of project-local dependencies.
+    Standard-library and third-party imports are ignored.
+    """
+
+    files = []
+
+    for file in iter_python_files():
+        try:
+            files.append(
+                str(file.relative_to(workspace))
+            )
+        except ValueError:
+            continue
+
+    files = sorted(files)
+
+    if not files:
+        return (
+            "Project Dependency Graph\n"
+            "========================\n\n"
+            "No Python files found."
+        )
+
+    graph_lines = []
+
+    for file in files:
+
+        result = find_module_dependencies(file)
+
+        if result.startswith(
+            "No project dependencies found"
+        ):
+            graph_lines.append(
+                f"{file}\n"
+                "    -> none"
+            )
+            continue
+
+        if result.startswith(
+            "Access denied."
+        ):
+            continue
+
+        if result.startswith(
+            "File "
+        ):
+            continue
+
+        if result.startswith(
+            "Could not parse"
+        ):
+            continue
+
+        dependencies = result.splitlines()
+
+        graph_lines.append(file)
+
+        for dependency in dependencies:
+            graph_lines.append(
+                f"    -> {dependency}"
+            )
+
+    return (
+        "Project Dependency Graph\n"
+        "========================\n\n"
+        + "\n".join(graph_lines)
+    )
+
 def list_classes() -> list[dict]:
     """
     List all Python classes in the workspace.
@@ -1112,6 +1185,18 @@ TOOLS = {
             "Generate a high-level overview of the Python project "
             "including files, classes, functions, dependencies, "
             "and dependents."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    },
+    "build_dependency_graph": {
+        "function": build_dependency_graph,
+        "description": (
+            "Build a project-level dependency graph showing "
+            "which Python files depend on other project files."
         ),
         "parameters": {
             "type": "object",

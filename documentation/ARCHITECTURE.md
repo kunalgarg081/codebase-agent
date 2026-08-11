@@ -189,6 +189,7 @@ Current AST Features:
 - Find Module Dependencies
 - Find Module Dependents
 - Analyze Project
+- Build Dependency Graph
 
 ## Symbol Reference Analysis
 

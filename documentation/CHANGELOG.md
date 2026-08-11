@@ -18,6 +18,8 @@ All notable changes to this project will be documented here.
 - Added reverse dependency analysis for project-local Python modules.
 - Added `analyze_project()` for high-level project structure and dependency analysis.
 - Added project overview analysis covering files, classes, functions, dependencies, and dependents.
+- Added `build_dependency_graph()` to visualize project-local Python module dependencies.
+- Added project-level dependency graph analysis.
 
 ### Testing
 
