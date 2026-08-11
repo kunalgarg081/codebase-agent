@@ -972,6 +972,67 @@ def find_module_dependents(path: str):
     return "\n".join(sorted(dependents))
 
 
+def find_module_impact(path: str) -> str:
+    """
+    Analyze the direct project impact of changing a Python module.
+
+    Returns the target module and the project files that directly
+    depend on it.
+    """
+
+    file = resolve_workspace_path(path)
+
+    if file is None:
+        return "Access denied."
+
+    if not file.exists():
+        return f"File '{path}' does not exist."
+
+    if not file.is_file():
+        return f"'{path}' is not a file."
+
+    if file.suffix != ".py":
+        return "Only Python files can be analyzed."
+
+    dependents = find_module_dependents(path)
+
+    if dependents.startswith(
+        "No project dependents found"
+    ):
+        return (
+            "Module Impact\n"
+            "=============\n\n"
+            f"Target: {path}\n\n"
+            "Direct dependents:\n"
+            "- None\n\n"
+            "Impact summary:\n"
+            f"No project files directly depend on {path}."
+        )
+
+    if dependents in (
+        "Access denied.",
+    ) or dependents.startswith(
+        "File "
+    ):
+        return dependents
+
+    dependent_files = dependents.splitlines()
+
+    return (
+        "Module Impact\n"
+        "=============\n\n"
+        f"Target: {path}\n\n"
+        "Direct dependents:\n"
+        + "\n".join(
+            f"- {dependent}"
+            for dependent in dependent_files
+        )
+        + "\n\n"
+        "Impact summary:\n"
+        f"{path} is directly imported by "
+        f"{len(dependent_files)} project file(s)."
+    )
+
 TOOLS = {
     "read_file": {
         "function": read_file,
@@ -1202,6 +1263,26 @@ TOOLS = {
             "type": "object",
             "properties": {},
             "required": [],
+        },
+    },
+    "find_module_impact": {
+        "function": find_module_impact,
+        "description": (
+            "Analyze the direct project impact of changing "
+            "a Python module by identifying files that depend on it."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": (
+                        "Relative path to the Python module "
+                        "to analyze."
+                    ),
+                }
+            },
+            "required": ["path"],
         },
     },
 }

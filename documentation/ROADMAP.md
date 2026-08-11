@@ -47,6 +47,7 @@ Completed:
 - ✅ find_module_dependents()
 - ✅ analyze_project()
 - ✅ build_dependency_graph()
+- ✅ find_module_impact()
 
 Next focus:
 

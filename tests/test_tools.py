@@ -17,6 +17,7 @@ from app.tools import (
     find_module_dependents,
     analyze_project,
     build_dependency_graph,
+    find_module_impact,
 )
 
 
@@ -330,3 +331,28 @@ def test_build_dependency_graph_all_files():
     assert "greet.py" in result
     assert "hello.py" in result
     assert "pytest_test.py" in result
+
+
+def test_find_module_impact():
+
+    result = find_module_impact("greet.py")
+
+    assert "Module Impact" in result
+    assert "greet.py" in result
+    assert "imports_demo.py" in result
+
+
+def test_find_module_impact_no_dependents():
+
+    result = find_module_impact("calculator.py")
+
+    assert "Direct dependents:" in result
+    assert "- None" in result
+    assert "No project files directly depend" in result
+
+
+def test_find_module_impact_missing_file():
+
+    result = find_module_impact("missing.py")
+
+    assert "does not exist" in result

@@ -20,6 +20,8 @@ All notable changes to this project will be documented here.
 - Added project overview analysis covering files, classes, functions, dependencies, and dependents.
 - Added `build_dependency_graph()` to visualize project-local Python module dependencies.
 - Added project-level dependency graph analysis.
+- Added `find_module_impact()` to identify files directly affected by changes to a Python module.
+- Added direct module impact analysis using project dependency relationships.
 
 ### Testing
 

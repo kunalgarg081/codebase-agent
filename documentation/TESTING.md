@@ -97,6 +97,7 @@ Examples:
 * [x] Find module dependents
 * [x] Analyze project
 * [x] Build dependency graph
+- [x] Find module impact
 
 ---
 
@@ -108,6 +109,7 @@ Examples:
 * [ ] Conversation memory
 * [x] Project overview
 * [x] Project file connections
+- [x] Module impact analysis
 
 ---
 
