@@ -107,7 +107,7 @@ Certification Status:
 
 | Result | Status |
 |---|---|
-| Pytest | ✅ 38/38 passed |
+| Pytest | ✅ 41/41 passed |
 
 ## Repository Intelligence
 
@@ -119,6 +119,7 @@ Certification Status:
 | `analyze_project()` | ✅ PASS | Generates a high-level project overview |
 | `build_dependency_graph()` | ✅ PASS | Builds a project-level dependency graph |
 | `find_module_impact()` | ✅ PASS | Identifies files directly affected by a module change |
+| `find_symbol_impact()` | ✅ PASS | Analyzes project references to a Python symbol |
 
 ## Manual Tests
 
@@ -137,6 +138,8 @@ Certification Status:
 | What depends on greet.py? | ✅ PASS |
 | What would be affected if I change greet.py? | ✅ PASS |
 | What would be affected if I change calculator.py? | ✅ PASS |
+| What would be affected if I change greet? | ✅ PASS |
+| What would be affected if I change Calculator? | ✅ PASS |
 
 ## Certification Status
 

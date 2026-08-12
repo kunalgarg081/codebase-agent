@@ -1033,6 +1033,47 @@ def find_module_impact(path: str) -> str:
         f"{len(dependent_files)} project file(s)."
     )
 
+def find_symbol_impact(symbol: str) -> str:
+    """
+    Analyze the project impact of changing a Python symbol.
+
+    Returns the symbol references found across the workspace.
+    """
+
+    if not symbol or not symbol.strip():
+        return "Symbol name cannot be empty."
+
+    symbol = symbol.strip()
+
+    references = find_symbol_references(symbol)
+
+    if not references:
+        return (
+            "Symbol Impact\n"
+            "=============\n\n"
+            f"Symbol: {symbol}\n\n"
+            "References:\n"
+            "- None\n\n"
+            "Impact summary:\n"
+            f"No references to '{symbol}' were found."
+        )
+
+    return (
+        "Symbol Impact\n"
+        "=============\n\n"
+        f"Symbol: {symbol}\n\n"
+        "References:\n"
+        + "\n".join(
+            f"- {reference}"
+            for reference in references
+        )
+        + "\n\n"
+        "Impact summary:\n"
+        f"The symbol '{symbol}' has "
+        f"{len(references)} reference(s) in the project."
+    )
+
+
 TOOLS = {
     "read_file": {
         "function": read_file,
@@ -1283,6 +1324,26 @@ TOOLS = {
                 }
             },
             "required": ["path"],
+        },
+    },
+    "find_symbol_impact": {
+        "function": find_symbol_impact,
+        "description": (
+            "Analyze the project impact of changing a Python symbol "
+            "by finding references to that symbol across the workspace."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": (
+                        "Python symbol name to analyze, such as "
+                        "a function, class, or variable."
+                    ),
+                }
+            },
+            "required": ["symbol"],
         },
     },
 }

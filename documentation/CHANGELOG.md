@@ -22,6 +22,8 @@ All notable changes to this project will be documented here.
 - Added project-level dependency graph analysis.
 - Added `find_module_impact()` to identify files directly affected by changes to a Python module.
 - Added direct module impact analysis using project dependency relationships.
+- Added `find_symbol_impact()` to analyze references to a Python symbol across the project.
+- Added function/class-level impact analysis using AST symbol references.
 
 ### Testing
 

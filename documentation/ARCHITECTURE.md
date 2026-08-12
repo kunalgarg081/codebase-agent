@@ -191,6 +191,7 @@ Current AST Features:
 - Analyze Project
 - Build Dependency Graph
 - Find Module Impact
+- Find Symbol Impact
 
 ## Symbol Reference Analysis
 

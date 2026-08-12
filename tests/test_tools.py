@@ -18,6 +18,7 @@ from app.tools import (
     analyze_project,
     build_dependency_graph,
     find_module_impact,
+    find_symbol_impact,
 )
 
 
@@ -356,3 +357,31 @@ def test_find_module_impact_missing_file():
     result = find_module_impact("missing.py")
 
     assert "does not exist" in result
+
+
+def test_find_symbol_impact():
+
+    result = find_symbol_impact("greet")
+
+    assert "Symbol Impact" in result
+    assert "Symbol: greet" in result
+    assert "greet.py" in result
+    assert "imports_demo.py" in result
+
+
+def test_find_symbol_impact_no_match():
+
+    result = find_symbol_impact(
+        "DefinitelyNotARealSymbol"
+    )
+
+    assert "Symbol Impact" in result
+    assert "References:" in result
+    assert "- None" in result
+
+
+def test_find_symbol_impact_empty_symbol():
+
+    result = find_symbol_impact("")
+
+    assert "cannot be empty" in result

@@ -110,6 +110,7 @@ Examples:
 * [x] Project overview
 * [x] Project file connections
 - [x] Module impact analysis
+- [x] Find symbol impact
 
 ---
 
